@@ -1,0 +1,16 @@
+<div class="navbar">
+  {% if login_enabled %}
+    <!-- if user is not logged in show login link -->
+    <!-- if user is logged in show username and logout link -->
+    {% if session['DSPACE_AUTHENTICATED'] %}
+      <span>{{ session['USERNAME'] }}</span>
+      <!-- my_dspace route -->
+      {% if request.endpoint != 'my_dspace_route' %}
+        <a href="{{ url_for('dspace.my_dspace_route') }}">My DSpace</a>
+      {% endif %}
+      <a href="{{ url_for('public.logout_route') }}">Logout</a>
+    {% else %}
+      <a href="{{ url_for('public.login_route') }}">Login</a>
+    {% endif %}
+  {% endif %}
+</div>
