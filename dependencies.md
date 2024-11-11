@@ -64,6 +64,48 @@ Below is a summary of the dependencies required for this Flask application.
 - **Version**: 2.22
 - **Description**: A parser for the C programming language, written in pure Python. `pycparser` is often used with `cffi` and other libraries that need to analyze and interact with C code, allowing Python packages like `cryptography` to function across different systems without requiring a compiled C parser.
 
+## Swagger / OpenAPI
+
+### PyYAML
+- **Version**: 6.0.2
+- **Description**: A YAML parsing and emitting library for Python. `PyYAML` is often used to handle configuration files in YAML format, which is commonly used in OpenAPI/Swagger specifications for defining API schemas.
+
+### attrs
+- **Version**: 24.2.0
+- **Description**: A library that simplifies the creation of classes by providing declarative syntax for defining attributes. `attrs` is often used in data validation and serialization, making it useful for managing structured data in API schemas.
+
+### flasgger
+- **Version**: 0.9.7.1
+- **Description**: A Flask extension that enables seamless integration of Swagger (OpenAPI) specifications. `flasgger` provides tools to automatically generate API documentation from Python docstrings, making it easier to create, maintain, and visualize RESTful APIs in Flask.
+
+### jsonschema
+- **Version**: 4.23.0
+- **Description**: A library for validating JSON data against a schema. It is essential for ensuring that API inputs and outputs conform to the defined schema, a crucial aspect of OpenAPI-compliant applications.
+
+### jsonschema-specifications
+- **Version**: 2024.10.1
+- **Description**: Provides the JSON Schema standards required by `jsonschema` for schema validation. This package enables precise adherence to the latest JSON Schema specifications, often needed in OpenAPI-compliant applications.
+
+### mistune
+- **Version**: 3.0.2
+- **Description**: A fast and extensible Markdown parser for Python. `mistune` is often used for rendering Markdown documentation within Swagger UI, allowing enhanced documentation presentation in APIs.
+
+### packaging
+- **Version**: 24.2
+- **Description**: Provides utilities to handle version parsing and comparison in Python. `packaging` is often used in deployment and dependency management contexts, ensuring compatibility of package versions in projects.
+
+### referencing
+- **Version**: 0.35.1
+- **Description**: A library that helps resolve references within complex schemas, commonly used alongside `jsonschema` to support JSON references within schema definitions. This is particularly useful in APIs that utilize nested or shared schema components.
+
+### rpds-py
+- **Version**: 0.21.0
+- **Description**: A library providing Python bindings to Rust’s data structures, such as sets and maps. It enhances performance and memory efficiency, especially useful for JSON schema validation when processing large or complex data structures.
+
+### six
+- **Version**: 1.16.0
+- **Description**: A compatibility library that allows code to work with both Python 2 and Python 3, providing utilities for cross-version compatibility. Although Python 2 has reached end-of-life, `six` is still used in many libraries for backward compatibility.
+
 ## Optional Dependencies for Deployment
 
 ### waitress
@@ -73,3 +115,9 @@ Below is a summary of the dependencies required for this Flask application.
 ### gunicorn
 - **Version**: 21.2.0
 - **Description**: A robust and widely-used WSGI server for Python web applications. Gunicorn is designed for Unix-based systems and is well-suited for larger applications and production environments due to its high concurrency support and flexibility. It is often used for deploying Flask applications on Linux servers.
+
+## Other
+
+### pytz
+- **Version**: 2024.2
+- **Description**: A library for working with time zones in Python, enabling accurate and up-to-date timezone calculations and conversions. `pytz` is commonly used in applications that need to handle multiple time zones or perform timezone-aware date and time manipulations.

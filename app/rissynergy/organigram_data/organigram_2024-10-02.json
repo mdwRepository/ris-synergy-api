@@ -1,0 +1,121 @@
+[
+  {
+    "id": "3",
+    "name": [
+      {
+        "lang": "de",
+        "trans": "O",
+        "text": "Universität Klagenfurt"
+      },
+      {
+        "lang": "en",
+        "trans": "H",
+        "text": "University Klagenfurt"
+      }
+    ],
+    "type": "UNIVERSITY",
+    "acronym": "AAU",
+    "electronicAddress": ["email:uni@aau.at", "tel:+43 463 2700"],
+    "identifiers": [
+      {
+        "type": "RIS_SYNERGY",
+        "value": "UL"
+      }
+    ],
+    "address": {
+      "countryCode": "AUT",
+      "addrline1": "Universitätsstr. 65-67",
+      "postCode": "9020",
+      "cityTown": "Klagenfurt",
+      "stateOfCountry": "Austria"
+    },
+    "level": "LEVEL_1",
+    "startDate": "1996-06-15T22:00:00.000+00:00"
+  },
+  {
+    "id": "828",
+    "name": [
+      {
+        "lang": "de",
+        "trans": "O",
+        "text": "Fakultät für Technische Wissenschaften"
+      },
+      {
+        "lang": "en",
+        "trans": "H",
+        "text": "FACULTY OF TECHNICAL SCIENCES"
+      }
+    ],
+    "type": "FACULTY",
+    "acronym": "TEWI",
+    "electronicAddress": ["email:TEWI@aau.at"],
+    "partOf": {
+      "id": "3",
+      "name": [
+        {
+          "lang": "de",
+          "trans": "O",
+          "text": "Universität Klagenfurt"
+        },
+        {
+          "lang": "en",
+          "trans": "H",
+          "text": "University Klagenfurt"
+        }
+      ]
+    },
+    "identifiers": [],
+    "address": {
+      "countryCode": "AUT",
+      "addrline1": "Universitätsstr. 65-67",
+      "postCode": "9020",
+      "cityTown": "Klagenfurt",
+      "stateOfCountry": "Austria"
+    },
+    "level": "LEVEL_2",
+    "startDate": "2006-12-19T23:00:00.000+00:00"
+  },
+  {
+    "id": "78",
+    "name": [
+      {
+        "lang": "de",
+        "trans": "O",
+        "text": "Institut für Informatik-Systeme"
+      },
+      {
+        "lang": "en",
+        "trans": "H",
+        "text": "Department of Informatics Systems"
+      }
+    ],
+    "type": "DEPARTMENT",
+    "acronym": "ISYS",
+    "electronicAddress": ["email:ISYS@aau.at"],
+    "partOf": {
+      "id": "828",
+      "name": [
+        {
+          "lang": "de",
+          "trans": "O",
+          "text": "Fakultät für Technische Wissenschaften"
+        },
+        {
+          "lang": "en",
+          "trans": "H",
+          "text": "FACULTY OF TECHNICAL SCIENCES"
+        }
+      ]
+    },
+    "identifiers": [],
+    "address": {
+      "countryCode": "AUT",
+      "addrline1": "Universitätsstr. 65-67",
+      "postCode": "9020",
+      "cityTown": "Klagenfurt",
+      "stateOfCountry": "Austria"
+    },
+    "level": "LEVEL_3",
+    "startDate": "1996-06-15T22:00:00.000+00:00"
+  }
+]

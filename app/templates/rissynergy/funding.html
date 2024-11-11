@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  DSpace Test Service
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2>DSpace Test Service</h2>
+    <p>RIS Synergy Funding Endpoint</p>
+    <p>URL: {{ url }}</p>
+    <p>{{ data }}</p>
+    <div class="container mt-5">
+        <p>Filters</p>
+        <form action="{{ url_for('ris-synergy.funding_item_route') }}" method="post">
+            <div class="form-group
+                <label for="fundingType">Funding Type</label>
+                <select class="form-control" id="fundingType" name="fundingType">
+                    <option value="">All</option>
+                    <option value="PROGRAMME">Programme</option>
+                    <option value="CALL">Call</option>
+                    <option value="ONGOING_CALL">Ongoing Call</option>
+                    <option value="AWARD">Award</option>
+                    <option value="GRANT">Grant</option>
+                    <option value="SCHOLARSHIP">Scholarship</option>
+                    <option value="RESEARCH_CONTRACT">Research Contract</option>
+                </select>
+                <label for="targetGroup">Target Group</label>
+                <select class="form-control" id="targetGroup" name="targetGroup">
+                    <option value="">All</option>
+                    <option value="UNIVERSITY">University</option>
+                    <option value="UNIVERSITY_OF_APPLIED_SCIENCES">University of Applied Sciences</option>
+                    <option value="PRIVATE_UNIVERSITY">Private University</option>
+                    <option value="RESEARCH_INSTITUTE">Research Institute</option>
+                    <option value="COMPANY">Company</option>
+                    <option value="PRIVATE_NON_PROFIT">Private Non-Profit</option>
+                    <option value="INDEPENDENT_RESEARCHER">Independent Researcher</option>
+                    <option value="GOVERNMENT">Government</option>
+                </select>
+                <label for="runningCalls">Running Calls</label>
+                <select class="form-control" id="runningCalls" name="runningCalls">
+                    <option value="">All</option>
+                    <option value="True">True</option>
+                    <option value="False">False</option>
+                </select>
+                <label for="region">Region</label>
+                <select class="form-control" id="region" name="region">
+                    <option value="">All</option>
+                    <option value="VIENNA">Vienna</option>
+                    <option value="LOWER_AUSTRIA">Lower Austria</option>
+                    <option value="UPPER_AUSTRIA">Upper Austria</option>
+                    <option value="BURGENLAND">Burgenland</option>
+                    <option value="STYRIA">Styria</option>
+                    <option value="CARINTHIA">Carinthia</option>
+                    <option value="SALZBURG">Salzburg</option>
+                    <option value="TYROL">Tyrol</option>
+                    <option value="VORARLBERG">Vorarlberg</option>
+                </select>
+                <label for="applicantsScope">Applicants Scope</label>
+                <select class="form-control" id="applicantsScope" name="applicantsScope">
+                    <option value="">All</option>
+                    <option value="NATIONAL">National</option>
+                    <option value="REGIONAL">Regional</option>
+                </select>
+                <label for="funderId">Funder Id</label>
+                <input type="text" class="form-control" id="funderId" name="funderId" placeholder="Funder Id">
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>    
+    {% if data %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Type</th>
+          <th scope="col">Name</th>
+          <th scope="col">Description</th>
+          <th scope="col">Funder</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for funding in data %}
+          <tr>
+            <td>{{ funding.id }}</td>
+            <td>{{ funding.type }}</td>
+            <td>
+                {% if funding.name %}
+                {% for name in funding.name %}
+                    <div>{{ name.text }}</div>
+                {% endfor %}
+                {% endif %}
+            </td>
+            <td>
+                {% if funding.description %}
+                {% for description in funding.description %}
+                    <div>{{ description.text }}</div>
+                {% endfor %}
+                {% endif %}
+            </td>
+            <td>{{ funding.funder }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endblock %}

@@ -11,6 +11,7 @@ import json
 # from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from flask import Flask, g
+from flasgger import Swagger
 from os import getenv
 
 from app.extensions import cors
@@ -115,6 +116,8 @@ def create_app():
         register_template_filters(app)
         register_blueprints(app)
         secure_app(app)
+        # Register Swagger (after blueprints)
+        register_swagger(app)
         return app
     except Exception as e:
         print(f"Error: ", e)
@@ -190,6 +193,51 @@ def register_blueprints(app):
         print(f"Error: ", e)
         sys.exit("Error: registering blueprints")
 
+
+def register_swagger(app):
+    """
+    Register the Swagger UI and serve a custom /apispec_1.json.
+    """
+    try:
+        # Define Swagger config to use the endpoint from the blueprint
+        swagger_config = {
+            "swagger": "2.0",
+            "uiversion": 3,
+            "headers": [],  # Ensure headers are defined as an empty list
+            "specs": [
+                {
+                    "endpoint": "apispec",
+                    # Use the blueprint's route for the OpenAPI spec
+                    "route": "/ris-synergy/ris_synergy.json",
+                    "rule_filter": lambda rule: True,  # include all routes
+                    "model_filter": lambda tag: True,   # include all models
+                }
+            ]
+        }
+
+        # Initialize Swagger with the custom config
+        swagger = Swagger(app, config=swagger_config)
+        
+        if swagger:
+            print("Swagger UI registered")
+
+            # Debugging: Log all registered routes
+            print("Registered Routes:")
+            for rule in app.url_map.iter_rules():
+                print(f"{rule.endpoint}: {rule.rule}")
+
+            # Log registered endpoints that are documented by Swagger
+            print("Endpoints documented by Swagger:")
+            for rule in app.url_map.iter_rules():
+                if "swagger" in rule.endpoint:
+                    print(f"{rule.endpoint}: {rule.rule}")
+
+        return None
+
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit("Error: registering Swagger UI")
+        
 
 def secure_app(app):
     """
