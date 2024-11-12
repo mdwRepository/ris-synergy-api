@@ -1,0 +1,594 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Project Api",
+    "description": "### Ids for Example Projects:\n\n> ***FFG Basisprogramm:*** AAUPROJ1234 </br>\n> ***FWF START:*** AAUPROJ1235 </br>\n> ***FWF Einzelprojekt:*** AAUPROJ1236 </br>\n> ***FFG FoKo:*** AAUPROJ1237 </br>\n> ***FFG Mobilität der Zukunft:*** AAUPROJ1238 </br>",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://rissyn.arisnet.ac.at/ris-synergy/project"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Projects",
+      "description": "Endpoints for Project Data"
+    }
+  ],
+  "paths": {
+    "/v1/projects": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "GET Endpoint for RisProject",
+        "description": "Get Endpoint for retrieving all RisProjects",
+        "operationId": "findAll",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projects/{id}": {
+      "get": {
+        "tags": [
+          "Projects"
+        ],
+        "summary": "GET Endpoint for RisProject",
+        "description": "Get Endpoint for retrieving RisProjects via ID",
+        "operationId": "findByKey",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseFunding": {
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FundingType"
+          },
+          "name": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "acronym": {
+            "type": "string"
+          },
+          "identifiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          }
+        }
+      },
+      "ConsortiumMember": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ProjectConsortiumEnum"
+          },
+          "orgUnit": {
+            "$ref": "#/components/schemas/OrgUnit"
+          }
+        }
+      },
+      "Funded": {
+        "type": "object",
+        "properties": {
+          "by": {
+            "$ref": "#/components/schemas/OrgUnit"
+          },
+          "as": {
+            "$ref": "#/components/schemas/Funding"
+          }
+        }
+      },
+      "Funding": {
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FundingType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FundingStatus"
+          },
+          "name": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "appliedAmount": {
+            "$ref": "#/components/schemas/Volume"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Volume"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "partOf": {
+            "$ref": "#/components/schemas/BaseFunding"
+          },
+          "recipients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recipient"
+            }
+          }
+        }
+      },
+      "FundingStatus": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=865)",
+        "enum": [
+          "APPLIED",
+          "REJECTED",
+          "APPROVED",
+          "WITHDRAWN"
+        ]
+      },
+      "FundingType": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=303)",
+        "enum": [
+          "PROGRAMME",
+          "CALL",
+          "ONGOING_CALL",
+          "RESEARCH_CONTRACT",
+          "AWARD",
+          "GRANT",
+          "SCHOLARSHIP"
+        ]
+      },
+      "Identifier": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/IdentifierTypeEnum"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "IdentifierTypeEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=937)",
+        "enum": [
+          "CROSSREF_GRANTID",
+          "PROJECT_NUMBER",
+          "APPLICATION_NUMBER",
+          "ORCID",
+          "ROR",
+          "RINGGOLD",
+          "RIS_SYNERGY"
+        ]
+      },
+      "LevelEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=902)",
+        "enum": [
+          "LEVEL_1",
+          "LEVEL_2",
+          "Level_3"
+        ]
+      },
+      "OrgUnit": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrganisationTypeEnum"
+          },
+          "acronym": {
+            "type": "string"
+          },
+          "electronicAddress": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "partOf": {
+            "$ref": "#/components/schemas/OrgUnit"
+          },
+          "identifier": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "address": {
+            "$ref": "#/components/schemas/PostAddress"
+          },
+          "submissionSystem": {
+            "type": "string"
+          },
+          "level": {
+            "$ref": "#/components/schemas/LevelEnum"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "website": {
+            "type": "string"
+          }
+        },
+        "description": "OrgUnit"
+      },
+      "OrganisationTypeEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=898)",
+        "enum": [
+          "UNIVERSITY",
+          "VICE_RECTORATE",
+          "FACULTY",
+          "SCHOOL",
+          "DEPARTMENT",
+          "UNIT",
+          "CENTRAL_SERVICES",
+          "UNIVERSITY_CENTRE",
+          "CLINIC",
+          "CLINICAL_UNIT"
+        ]
+      },
+      "Person": {
+        "required": [
+          "personId"
+        ],
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string"
+          },
+          "electronicAddress": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "identifier": {
+            "$ref": "#/components/schemas/Identifier"
+          },
+          "personName": {
+            "$ref": "#/components/schemas/PersonName"
+          }
+        }
+      },
+      "PersonName": {
+        "type": "object",
+        "properties": {
+          "familyName": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "firstName": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PostAddress": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "addrline1": {
+            "type": "string"
+          },
+          "postCode": {
+            "type": "string"
+          },
+          "cityTown": {
+            "type": "string"
+          },
+          "stateOfCountry": {
+            "type": "string"
+          }
+        },
+        "description": "The funder's postal address."
+      },
+      "Project": {
+        "required": [
+          "acronym",
+          "id",
+          "status",
+          "title",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "identifiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "type": {
+            "$ref": "#/components/schemas/ProjectTypeEnum"
+          },
+          "acronym": {
+            "type": "string"
+          },
+          "title": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subject"
+            }
+          },
+          "keyword": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "abstract": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "abstractPR": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Text"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProjectStatusEnum"
+          },
+          "reportingScheme": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reportingDeadlines": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "url": {
+            "type": "string"
+          },
+          "clinicalStudy": {
+            "type": "boolean"
+          },
+          "team": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamMember"
+            }
+          },
+          "consortium": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsortiumMember"
+            }
+          },
+          "funded": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Funded"
+            }
+          }
+        }
+      },
+      "ProjectConsortiumEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=334)",
+        "enum": [
+          "COORDINATOR",
+          "PARTNER"
+        ]
+      },
+      "ProjectStatusEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=332)",
+        "enum": [
+          "IN_PREPERATION",
+          "ACTIVE",
+          "COMPLETED",
+          "CANCELLED",
+          "REJECTED"
+        ]
+      },
+      "ProjectTeamEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=336)",
+        "enum": [
+          "PRINCIPAL_INVESTIGATOR"
+        ]
+      },
+      "ProjectTypeEnum": {
+        "type": "string",
+        "description": "[Vocabulary](https://documentation.forschungsdaten.at/?page_id=328)",
+        "enum": [
+          "RESEARCH_PROJECT",
+          "CONTRACT_RESEARCH",
+          "COLLABORATIVE_RESEARCH"
+        ]
+      },
+      "Recipient": {
+        "type": "object",
+        "properties": {
+          "appliedAmount": {
+            "$ref": "#/components/schemas/Volume"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/Volume"
+          },
+          "orgUnit": {
+            "$ref": "#/components/schemas/OrgUnit"
+          }
+        }
+      },
+      "Subject": {
+        "type": "object",
+        "properties": {
+          "fraction": {
+            "type": "number"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "TeamMember": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ProjectTeamEnum"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "affiliation": {
+            "$ref": "#/components/schemas/OrgUnit"
+          }
+        }
+      },
+      "Text": {
+        "required": [
+          "lang",
+          "text",
+          "trans"
+        ],
+        "type": "object",
+        "properties": {
+          "lang": {
+            "type": "string"
+          },
+          "trans": {
+            "$ref": "#/components/schemas/TranslationEnum"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "description": "Class for Multilingual Strings; Including Language Code and Translation Method"
+      },
+      "TranslationEnum": {
+        "type": "string",
+        "description": "O=Original; H=Human-Translated; M=Machine-Translated",
+        "enum": [
+          "O",
+          "H",
+          "M"
+        ]
+      },
+      "Volume": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

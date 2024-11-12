@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  DSpace Test Service
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2>DSpace Test Service</h2>
+    <p>RIS Synergy Info Endpoint</p>
+    <p>URL: {{ url }}</p>
+    {% if data.endpoints.info %}
+    <h3>Info Endpoints</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Major Version</th>
+          <th scope="col">Minor Version</th>
+          <th scope="col">URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for endpoint in data.endpoints.info %}
+          <tr>
+            <td>{{ endpoint.name }}</td>
+            <td>{{ endpoint.majorVersion }}</td>
+            <td>{{ endpoint.minorVersion }}</td>
+            <td><a href="{{ endpoint.url }}">{{ endpoint.url }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    {% if data.endpoints.orgUnit %}
+    <h3>OrgUnit Endpoints</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Major Version</th>
+          <th scope="col">Minor Version</th>
+          <th scope="col">URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for endpoint in data.endpoints.orgUnit %}
+          <tr>
+            <td>{{ endpoint.name }}</td>
+            <td>{{ endpoint.majorVersion }}</td>
+            <td>{{ endpoint.minorVersion }}</td>
+            <td><a href="{{ endpoint.url }}">{{ endpoint.url }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    {% if data.endpoints.funding %}
+    <h3>Funding Endpoints</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Major Version</th>
+          <th scope="col">Minor Version</th>
+          <th scope="col">URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for endpoint in data.endpoints.funding %}
+          <tr>
+            <td>{{ endpoint.name }}</td>
+            <td>{{ endpoint.majorVersion }}</td>
+            <td>{{ endpoint.minorVersion }}</td>
+            <td><a href="{{ endpoint.url }}">{{ endpoint.url }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    {% if data.endpoints.project %}
+    <h3>Project Endpoints</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Major Version</th>
+          <th scope="col">Minor Version</th>
+          <th scope="col">URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for endpoint in data.endpoints.project %}
+          <tr>
+            <td>{{ endpoint.name }}</td>
+            <td>{{ endpoint.majorVersion }}</td>
+            <td>{{ endpoint.minorVersion }}</td>
+            <td><a href="{{ endpoint.url }}">{{ endpoint.url }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+{% endblock %}

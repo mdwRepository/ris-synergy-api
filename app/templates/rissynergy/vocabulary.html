@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  DSpace Test Service
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>DSpace Test Service</h2>
+    <p>RIS Synergy Vocabulary</p>
+    <ul>
+        {% for entry in data.vocabulary %}
+            <li>{{ entry }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

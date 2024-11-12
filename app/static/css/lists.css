@@ -1,0 +1,30 @@
+h2{
+    color: var(--mdwblue);
+}
+
+h4{
+    display: inline-block;
+    width: 80%;
+}
+
+small{
+    display: block;
+}
+
+span{
+    color: var(--mdwblue);
+    float: right;
+}
+
+ul{
+    margin-bottom: 0;  
+}
+
+.card-header, .card-footer{
+    background-color: var(--gray);
+}
+
+.btn-primary, .badge-primary{
+    background-color: var(--mdwblue);
+    border-color: var(--mdwblue);
+}

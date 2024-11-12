@@ -1,0 +1,199 @@
+:root {
+  --mdwblue: #003b79;
+  --white: #ffffff;
+  --gray: #d2dce5;
+}
+p,
+ol,
+dl {
+  line-height: 24px;
+  margin-bottom: 24px;
+}
+a:link {
+  color: #4f6780;
+}
+a:visited {
+  color: #888888;
+}
+a:hover,
+a:active,
+a:focus {
+  color: #3763a6;
+}
+footer a {
+  color: #ffffff;
+}
+footer a:link {
+  color: #ffffff;
+}
+footer a:visited {
+  color: #ffffff;
+}
+.button,
+button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"] {
+  background-color: #000000;
+  color: #ffffff !important;
+}
+.button,
+button,
+input[type="reset"],
+input[type="submit"],
+input[type="button"] {
+  background-color: #003b79;
+  color: #ffffff !important;
+}
+
+/* header */
+header {
+  background-color: var(--mdwblue);
+  /* mdwblue */
+}
+header ul {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-left: 0;
+}
+.header-flexBox {
+  display: -webkit-flex;
+  display: flex;
+  list-style-type: none;
+  padding-top: 15px;
+  justify-content: flex-end;
+}
+.header-flexBox .headerLeft {
+  margin-right: auto;
+}
+.header-flexBox a {
+  text-decoration: none;
+  color: #ffffff;
+}
+.header-firstRow {
+  height: 40px;
+}
+.header-firstRow .mdwRepository {
+  font-family: "Oswald";
+  font-weight: 300;
+  font-style: normal;
+  font-size: 1.2em;
+  text-decoration: none;
+  padding-top: 5px;
+}
+.header-firstRow .mdwLogo {
+  padding-top: 10px;
+  min-width: 120px;
+}
+.sr-only {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+.svgLogo {
+  background-repeat: no-repeat;
+  display: block;
+  background-image: url(https://repo.mdw.ac.at/shared/images/mdw-logo-white.svg);
+  height: 75px;
+  width: 120px;
+}
+.appname {
+  font-family: "Oswald";
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.2em;
+  text-decoration: none;
+}
+.header-secondRow {
+  height: 80px;
+}
+
+/* footer */
+footer {
+  color: var(--white);
+  background-color: var(--mdwblue);
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+/* navbar */
+.navbar {
+  background-color: #d2dce5;
+  border: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* media devices */
+@media screen and (max-width: 540px) {
+  .header-flexBox .right {
+    visibility: hidden;
+  }
+}
+@media screen and (min-width: 540px) and (max-width: 768px) {
+  header {
+    background-color: var(--mdwblue);
+    border: 0;
+  }
+}
+@media screen and (min-width: 768px) {
+  header {
+    background-color: var(--mdwblue);
+    border: 0;
+  }
+}
+
+.my_dspace_tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.my_dspace_tile {
+  width: 200px;
+  height: 200px;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}
+.my_dspace_tile_text, .my_dspace_tile_text a {
+  text-align: center;
+}
+.my_dspace_tile:nth-child(odd){
+  background-color: var(--gray);
+  border: 1px solid var(--gray);
+}
+.my_dspace_tile:nth-child(even) {
+  background-color: var(--mdwblue);
+  border: 1px solid var(--mdwblue);
+}
+.my_dspace_tile_text a h3{
+  font-size: 1.25em;
+}
+.my_dspace_tile:nth-child(odd) a{
+  color: #212529;
+}
+.my_dspace_tile:nth-child(even) a {
+  color: var(--white);
+}
+
+.my_dspace_tile img {
+  max-width: 16px;
+  max-height: 16px;
+  text-align: center;
+}
+
+/* Bootstrap Override */
+.btn-outline-primary{
+  border-color: var(--mdwblue) !important;
+  color: var(--mdwblue) !important;
+}
+
+.btn-outline-primary:hover{
+  background-color: var(--mdwblue) !important;
+  border-color: var(--mdwblue) !important;
+  color: var(--white) !important;
+}

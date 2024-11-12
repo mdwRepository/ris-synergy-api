@@ -1,0 +1,29 @@
+<header>
+  <div class="container header-firstRow">
+    <div>
+      <ul class="header-flexBox">
+        <li class="headerLeft mdwRepository">
+          <a href="https://repo.mdw.ac.at/" hreflang="en-us" title="go to the homepage of the mdwRepository">mdwRepository</a>
+          <span class="sr-only">this link will forward to the mdwRepository homepage</span>
+        </li>
+        <li class="mdwLogo">
+          <a href="https://mdw.ac.at/" aria-label="mdw website" title="zur Homepage der mdw" hreflang="en-us"><div class="svgLogo"></div></a>
+          <span class="sr-only">go to the homepage of the mdw</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="container header-secondRow">
+    <div>
+      <ul class="header-flexBox">
+        <li class="headerLeft appname">
+          <!-- change to project title abbreviation if needed -->
+          <a href="{{ url_for('public.index_route') }}">{{ request.portal_name }}</a>
+        </li>
+        <li class="right">
+          <!-- <span class="text-white">Quicklinks</span> -->
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
