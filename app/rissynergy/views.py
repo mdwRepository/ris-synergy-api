@@ -178,7 +178,7 @@ def get_info_schema():
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
         return abort(500, description="Internal server error")
-    
+
 
 @blueprint.route("/ris-synergy/apidocs/orgunit", methods=["GET"])
 @swag_from(PROJECT_OPENAPI_SPEC_PATH)
@@ -190,7 +190,7 @@ def show_info_schema_apidocs():
     schema_url = url_for("ris-synergy.get_info_schema", _external=True)
     # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
     return redirect(f"/apidocs?url={schema_url}")
-    
+
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
 def get_orgunit_schema():
@@ -205,7 +205,7 @@ def get_orgunit_schema():
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
         return abort(500, description="Internal server error")
-    
+
 
 @blueprint.route("/ris-synergy/apidocs/orgunit", methods=["GET"])
 @swag_from(PROJECT_OPENAPI_SPEC_PATH)
@@ -256,7 +256,9 @@ def get_organigram():
         logging.debug("latest_file: ", latest_file)
         if not latest_file:
             return abort(404, description="No organigram data available.")
-        with open(os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8") as json_file:
+        with open(
+            os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8"
+        ) as json_file:
             data = json.load(json_file)
             return jsonify(data)
     except json.JSONDecodeError as json_error:
@@ -268,7 +270,7 @@ def get_organigram():
     except Exception as e:
         logging.error(f"Error fetching organigram data or Swagger definition: {e}")
         return abort(500, description="Internal server error")
-    
+
 
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
 def get_project_schema():
@@ -283,7 +285,7 @@ def get_project_schema():
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
         return abort(500, description="Internal server error")
-    
+
 
 @blueprint.route("/ris-synergy/apidocs/project", methods=["GET"])
 @swag_from(PROJECT_OPENAPI_SPEC_PATH)
