@@ -161,3 +161,48 @@ def get_ris_synergy_schema():
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
         return abort(500, description="Internal server error")
+
+
+@blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
+def get_info_schema():
+    """
+    Get Info JSON Schema
+    This endpoint serves the JSON schema for the info endpoint.
+    """
+    try:
+        with open(INFO_SCHEMA_PATH, "r", encoding="utf-8") as schema_file:
+            schema = json.load(schema_file)
+        return jsonify(schema)
+    except Exception as e:
+        logging.error(f"Error fetching JSON schema: {e}")
+        return abort(500, description="Internal server error")
+    
+
+@blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
+def get_orgunit_schema():
+    """
+    Get OrgUnit JSON Schema
+    This endpoint serves the JSON schema for organizational units.
+    """
+    try:
+        with open(ORGUNIT_SCHEMA_PATH, "r", encoding="utf-8") as schema_file:
+            schema = json.load(schema_file)
+        return jsonify(schema)
+    except Exception as e:
+        logging.error(f"Error fetching JSON schema: {e}")
+        return abort(500, description="Internal server error")
+    
+
+@blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
+def get_project_schema():
+    """
+    Get Project JSON Schema
+    This endpoint serves the JSON schema for projects.
+    """
+    try:
+        with open(PROJECT_SCHEMA_PATH, "r", encoding="utf-8") as schema_file:
+            schema = json.load(schema_file)
+        return jsonify(schema)
+    except Exception as e:
+        logging.error(f"Error fetching JSON schema: {e}")
+        return abort(500, description="Internal server error")
