@@ -1,6 +1,6 @@
 # Flask
-Flask==3.0.0
-Flask-Cors==4.0.2
+Flask==3.1.0
+Flask-Cors==5.0.0
 Flask-Negotiate==0.1.0
 Jinja2==3.1.4
 MarkupSafe==3.0.2
@@ -11,8 +11,8 @@ colorama==0.4.6
 flask-talisman==1.1.0
 itsdangerous==2.2.0
 # Security and Environment Configuration
-python-dotenv==1.0.0
-cryptography==43.0.1
+python-dotenv==1.0.1
+cryptography==43.0.3
 cffi==1.17.1
 pycparser==2.22
 # Swagger / OpenAPI
@@ -35,3 +35,4 @@ pytz==2024.2
 charset-normalizer==3.4.0
 idna==3.10 
 requests==2.32.3
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
