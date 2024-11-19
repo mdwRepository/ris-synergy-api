@@ -56,15 +56,18 @@ if check_if_env_file_exists():
 if not check_if_required_env_variables_are_set():
     sys.exit("Error: required environment variables not set")
 
-# if sentry is enabled, initialize it
-if os.getenv("SENTRY_DSN"):
-    import sentry_sdk
 
+# Sentry utility function
+def is_sentry_enabled():
+    return bool(os.getenv("SENTRY_DSN"))
+
+
+# Initialize Sentry if enabled
+if is_sentry_enabled():
+    import sentry_sdk
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        traces_sample_rate=1.0,
+        traces_sample_rate=1.0,  # Capture 100% of transactions for performance monitoring
     )
 
 
