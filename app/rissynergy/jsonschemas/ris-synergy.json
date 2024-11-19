@@ -1,13 +1,13 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "RIS Synergy Api",
+    "title": "RIS Synergy API",
     "version": "1.0",
-    "description": "RIS Synergy Api"
+    "description": "RIS Synergy API"
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5000/ris-synergy"
+      "url": "https://ris-synergy.mdw.ac.at/ris-synergy"
     }
   ],
   "tags": [
