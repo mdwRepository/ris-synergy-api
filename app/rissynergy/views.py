@@ -187,10 +187,14 @@ def show_info_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for info schema.
     """
-    # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_info_schema", _external=True)
-    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-    return redirect(f"/apidocs?url={schema_url}")
+    try:
+        # Use url_for to dynamically build the path to the schema endpoint
+        schema_url = url_for("ris-synergy.get_info_schema", _external=True)
+        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+        return redirect(f"/apidocs?url={schema_url}")
+    except Exception as e:
+        logging.error(f"Error redirecting to Swagger UI: {e}")
+        return abort(500, description="Internal server error")
 
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
@@ -214,10 +218,14 @@ def show_orgunits_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for orgunit schema.
     """
-    # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_orgunit_schema", _external=True)
-    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-    return redirect(f"/apidocs?url={schema_url}")
+    try:
+        # Use url_for to dynamically build the path to the schema endpoint
+        schema_url = url_for("ris-synergy.get_orgunit_schema", _external=True)
+        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+        return redirect(f"/apidocs?url={schema_url}")
+    except Exception as e:
+        logging.error(f"Error redirecting to Swagger UI: {e}")
+        return abort(500, description="Internal server error")
 
 
 @blueprint.route(
@@ -232,33 +240,44 @@ def get_organigram():
     """Get Organigram Data
     This endpoint serves the organizational tree of the university.
     """
-    
-    # Token extraction and verification
-    auth_header = request.headers.get("Authorization", None)
-    if not auth_header or not auth_header.startswith("Bearer "):
-        abort(401, description="Authorization header missing or malformed")
+    try:
 
-    token = auth_header.split(" ")[1]
-    verify_token(token)  # Verify the token with Keycloak
-    
-    # Debug to check if the file exists
-    if not os.path.exists(ORGUNIT_OPENAPI_SPEC_PATH):
-        logging.error(f"OpenAPI spec file not found: {ORGUNIT_OPENAPI_SPEC_PATH}")
-        return abort(
-            500, description="Internal server error: OpenAPI spec file not found."
-        )
+        # Token extraction and verification
+        auth_header = request.headers.get("Authorization", None)
+        if not auth_header or not auth_header.startswith("Bearer "):
+            abort(401, description="Authorization header missing or malformed")
 
-    # Log the loaded OpenAPI spec path and content (for debugging purposes)
-    with open(ORGUNIT_OPENAPI_SPEC_PATH, "r", encoding="utf-8") as f:
-        spec_content = f.read()
-        logging.debug(f"Loaded OpenAPI Spec: {spec_content}")
+        token = auth_header.split(" ")[1]
+        verify_token(token)  # Verify the token with Keycloak
 
-    # Check if the OpenAPI spec file is a valid YAML file
-    if not is_valid_yaml(ORGUNIT_OPENAPI_SPEC_PATH):
-        return abort(
-            500,
-            description="Internal server error: Invalid YAML format in OpenAPI spec.",
-        )
+    except Exception as e:
+        logging.error(f"Error verifying token: {e}")
+        return abort(401, description="Unauthorized")
+
+    try:
+
+        # Debug to check if the file exists
+        if not os.path.exists(ORGUNIT_OPENAPI_SPEC_PATH):
+            logging.error(f"OpenAPI spec file not found: {ORGUNIT_OPENAPI_SPEC_PATH}")
+            return abort(
+                500, description="Internal server error: OpenAPI spec file not found."
+            )
+
+        # Log the loaded OpenAPI spec path and content (for debugging purposes)
+        with open(ORGUNIT_OPENAPI_SPEC_PATH, "r", encoding="utf-8") as f:
+            spec_content = f.read()
+            logging.debug(f"Loaded OpenAPI Spec: {spec_content}")
+
+        # Check if the OpenAPI spec file is a valid YAML file
+        if not is_valid_yaml(ORGUNIT_OPENAPI_SPEC_PATH):
+            return abort(
+                500,
+                description="Internal server error: Invalid YAML format in OpenAPI spec.",
+            )
+
+    except Exception as e:
+        logging.error(f"Error loading OpenAPI spec: {e}")
+        return abort(500, description="Internal server error")
 
     try:
         # Fetch the latest organigram data
@@ -303,7 +322,11 @@ def show_projects_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for project schema.
     """
-    # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_project_schema", _external=True)
-    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-    return redirect(f"/apidocs?url={schema_url}")
+    try:
+        # Use url_for to dynamically build the path to the schema endpoint
+        schema_url = url_for("ris-synergy.get_project_schema", _external=True)
+        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+        return redirect(f"/apidocs?url={schema_url}")
+    except Exception as e:
+        logging.error(f"Error redirecting to Swagger UI: {e}")
+        return abort(500, description="Internal server error")
