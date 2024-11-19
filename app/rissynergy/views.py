@@ -15,6 +15,7 @@ from flask import (
     jsonify,
     abort,
     url_for,
+    current_app,
 )
 
 from flask_negotiate import produces
@@ -240,19 +241,20 @@ def get_organigram():
     """Get Organigram Data
     This endpoint serves the organizational tree of the university.
     """
-    try:
+    # Conditional Keycloak token verification
+    if current_app.config.get("KEYCLOAK_ENABLED", False):
+        try:
+            # Token extraction and verification
+            auth_header = request.headers.get("Authorization", None)
+            if not auth_header or not auth_header.startswith("Bearer "):
+                abort(401, description="Authorization header missing or malformed")
 
-        # Token extraction and verification
-        auth_header = request.headers.get("Authorization", None)
-        if not auth_header or not auth_header.startswith("Bearer "):
-            abort(401, description="Authorization header missing or malformed")
+            token = auth_header.split(" ")[1]
+            verify_token(token)  # Verify the token with Keycloak
 
-        token = auth_header.split(" ")[1]
-        verify_token(token)  # Verify the token with Keycloak
-
-    except Exception as e:
-        logging.error(f"Error verifying token: {e}")
-        return abort(401, description="Unauthorized")
+        except Exception as e:
+            logging.error(f"Error verifying token: {e}")
+            return abort(401, description="Unauthorized")
 
     try:
 
