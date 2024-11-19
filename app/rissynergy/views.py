@@ -140,6 +140,7 @@ def get_latest_json_file():
 
 
 @blueprint.route("/ris-synergy/ris_synergy.json", methods=["GET"])
+@produces("application/json")
 def get_ris_synergy_schema():
     """
     Get RIS Synergy JSON Schema
@@ -167,6 +168,7 @@ def get_ris_synergy_schema():
 
 
 @blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
+@produces("application/json")
 def get_info_schema():
     """
     Get Info JSON Schema
@@ -198,6 +200,7 @@ def show_info_schema_apidocs():
 
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
+@produces("application/json")
 def get_orgunit_schema():
     """
     Get OrgUnit JSON Schema
@@ -237,6 +240,7 @@ def show_orgunits_schema_apidocs():
     methods=["GET"],
 )
 @keycloak_protected
+@produces("application/json")
 def get_organigram():
     """Get Organigram Data
     This endpoint serves the organizational tree of the university.
@@ -289,6 +293,7 @@ def get_organigram():
 
 
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
+@produces("application/json")
 def get_project_schema():
     """
     Get Project JSON Schema
