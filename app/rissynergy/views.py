@@ -22,6 +22,7 @@ from datetime import datetime
 from flasgger import swag_from
 
 from app.decorators import set_theme
+from app.auth import verify_token
 
 
 static_url_path = os.getenv("STATIC_URL_PATH") or None
@@ -231,6 +232,15 @@ def get_organigram():
     """Get Organigram Data
     This endpoint serves the organizational tree of the university.
     """
+    
+    # Token extraction and verification
+    auth_header = request.headers.get("Authorization", None)
+    if not auth_header or not auth_header.startswith("Bearer "):
+        abort(401, description="Authorization header missing or malformed")
+
+    token = auth_header.split(" ")[1]
+    verify_token(token)  # Verify the token with Keycloak
+    
     # Debug to check if the file exists
     if not os.path.exists(ORGUNIT_OPENAPI_SPEC_PATH):
         logging.error(f"OpenAPI spec file not found: {ORGUNIT_OPENAPI_SPEC_PATH}")
