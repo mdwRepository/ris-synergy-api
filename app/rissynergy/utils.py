@@ -33,7 +33,7 @@ def validate_json_against_json_schema(json_data, json_schema):
     """
     try:
         # validate json_data against json_schema
-        print(f"Validating JSON data against JSON schema")
+        print("Validating JSON data against JSON schema")
         validate(instance=json_data, schema=json_schema)
         return True
     except validate.ValidationError as e:

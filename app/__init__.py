@@ -80,9 +80,9 @@ try:
     print("static folder: ", static_folder)
 
 except ValueError as e:
-    print(f"Error: ", e)
+    print("Error: ", e)
 except Exception as e:
-    print(f"Error: ", e)
+    print("Error: ", e)
 
 
 def create_app():
@@ -120,7 +120,7 @@ def create_app():
         register_swagger(app)
         return app
     except Exception as e:
-        print(f"Error: ", e)
+        print("Error: ", e)
         sys.exit("Error: creating app")
 
 
@@ -141,7 +141,7 @@ def configure_logger(app):
         if setup_stream_handler() is not None:
             app.logger.addHandler(setup_stream_handler())
     except Exception as e:
-        print(f"Error: ", e)
+        print("Error: ", e)
         sys.exit("Error: configuring logger")
 
 
@@ -179,7 +179,7 @@ def register_blueprints(app):
                 except ImportError as e:
                     print(f"Failed to import or register blueprint: {e}")
                 except Exception as e:
-                    print(f"Error: ", e)
+                    print("Error: ", e)
                     sys.exit("Error: registering blueprints")
 
             print("Available routes in the blueprints:")
@@ -190,7 +190,7 @@ def register_blueprints(app):
     except ImportError as e:
         print(f"Failed to import or register blueprint: {e}")
     except Exception as e:
-        print(f"Error: ", e)
+        print("Error: ", e)
         sys.exit("Error: registering blueprints")
 
 
