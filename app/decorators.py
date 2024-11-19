@@ -34,7 +34,7 @@ def set_matomo_enabled(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         request.matomo_enabled = os.getenv(
-            "MAZOMO_ENABLED", "true"
+            "MATOMO_ENABLED", "true"
         )  # Adding matomo_enabled to request context
         request.matomo_url = os.getenv("MATOMO_URL", "")
         request.matomo_site_id = os.getenv("MATOMO_SITE_ID", "")
