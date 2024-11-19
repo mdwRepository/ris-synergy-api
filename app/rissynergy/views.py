@@ -181,7 +181,7 @@ def get_info_schema():
         return abort(500, description="Internal server error")
 
 
-@blueprint.route("/ris-synergy/apidocs/orgunit", methods=["GET"])
+@blueprint.route("/ris-synergy/apidocs/info", methods=["GET"])
 @swag_from(PROJECT_OPENAPI_SPEC_PATH)
 def show_info_schema_apidocs():
     """
