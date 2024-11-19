@@ -15,13 +15,14 @@ from flask import (
     jsonify,
     abort,
     url_for,
+    current_app,
 )
 
 from flask_negotiate import produces
 from datetime import datetime
 from flasgger import swag_from
 
-from app.decorators import set_theme
+from app.decorators import keycloak_protected
 
 
 static_url_path = os.getenv("STATIC_URL_PATH") or None
@@ -139,6 +140,7 @@ def get_latest_json_file():
 
 
 @blueprint.route("/ris-synergy/ris_synergy.json", methods=["GET"])
+@produces("application/json")
 def get_ris_synergy_schema():
     """
     Get RIS Synergy JSON Schema
@@ -166,6 +168,7 @@ def get_ris_synergy_schema():
 
 
 @blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
+@produces("application/json")
 def get_info_schema():
     """
     Get Info JSON Schema
@@ -180,19 +183,24 @@ def get_info_schema():
         return abort(500, description="Internal server error")
 
 
-@blueprint.route("/ris-synergy/apidocs/orgunit", methods=["GET"])
+@blueprint.route("/ris-synergy/apidocs/info", methods=["GET"])
 @swag_from(PROJECT_OPENAPI_SPEC_PATH)
 def show_info_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for info schema.
     """
-    # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_info_schema", _external=True)
-    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-    return redirect(f"/apidocs?url={schema_url}")
+    try:
+        # Use url_for to dynamically build the path to the schema endpoint
+        schema_url = url_for("ris-synergy.get_info_schema", _external=True)
+        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+        return redirect(f"/apidocs?url={schema_url}")
+    except Exception as e:
+        logging.error(f"Error redirecting to Swagger UI: {e}")
+        return abort(500, description="Internal server error")
 
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
+@produces("application/json")
 def get_orgunit_schema():
     """
     Get OrgUnit JSON Schema
@@ -213,10 +221,14 @@ def show_orgunits_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for orgunit schema.
     """
-    # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_orgunit_schema", _external=True)
-    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-    return redirect(f"/apidocs?url={schema_url}")
+    try:
+        # Use url_for to dynamically build the path to the schema endpoint
+        schema_url = url_for("ris-synergy.get_orgunit_schema", _external=True)
+        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+        return redirect(f"/apidocs?url={schema_url}")
+    except Exception as e:
+        logging.error(f"Error redirecting to Swagger UI: {e}")
+        return abort(500, description="Internal server error")
 
 
 @blueprint.route(
@@ -227,28 +239,36 @@ def show_orgunits_schema_apidocs():
     endpoint="ris-synergy.organigram",
     methods=["GET"],
 )
+@keycloak_protected
+@produces("application/json")
 def get_organigram():
     """Get Organigram Data
     This endpoint serves the organizational tree of the university.
     """
-    # Debug to check if the file exists
-    if not os.path.exists(ORGUNIT_OPENAPI_SPEC_PATH):
-        logging.error(f"OpenAPI spec file not found: {ORGUNIT_OPENAPI_SPEC_PATH}")
-        return abort(
-            500, description="Internal server error: OpenAPI spec file not found."
-        )
+    try:
 
-    # Log the loaded OpenAPI spec path and content (for debugging purposes)
-    with open(ORGUNIT_OPENAPI_SPEC_PATH, "r", encoding="utf-8") as f:
-        spec_content = f.read()
-        logging.debug(f"Loaded OpenAPI Spec: {spec_content}")
+        # Debug to check if the file exists
+        if not os.path.exists(ORGUNIT_OPENAPI_SPEC_PATH):
+            logging.error(f"OpenAPI spec file not found: {ORGUNIT_OPENAPI_SPEC_PATH}")
+            return abort(
+                500, description="Internal server error: OpenAPI spec file not found."
+            )
 
-    # Check if the OpenAPI spec file is a valid YAML file
-    if not is_valid_yaml(ORGUNIT_OPENAPI_SPEC_PATH):
-        return abort(
-            500,
-            description="Internal server error: Invalid YAML format in OpenAPI spec.",
-        )
+        # Log the loaded OpenAPI spec path and content (for debugging purposes)
+        with open(ORGUNIT_OPENAPI_SPEC_PATH, "r", encoding="utf-8") as f:
+            spec_content = f.read()
+            logging.debug(f"Loaded OpenAPI Spec: {spec_content}")
+
+        # Check if the OpenAPI spec file is a valid YAML file
+        if not is_valid_yaml(ORGUNIT_OPENAPI_SPEC_PATH):
+            return abort(
+                500,
+                description="Internal server error: Invalid YAML format in OpenAPI spec.",
+            )
+
+    except Exception as e:
+        logging.error(f"Error loading OpenAPI spec: {e}")
+        return abort(500, description="Internal server error")
 
     try:
         # Fetch the latest organigram data
@@ -273,6 +293,7 @@ def get_organigram():
 
 
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
+@produces("application/json")
 def get_project_schema():
     """
     Get Project JSON Schema
@@ -293,7 +314,11 @@ def show_projects_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for project schema.
     """
-    # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_project_schema", _external=True)
-    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-    return redirect(f"/apidocs?url={schema_url}")
+    try:
+        # Use url_for to dynamically build the path to the schema endpoint
+        schema_url = url_for("ris-synergy.get_project_schema", _external=True)
+        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+        return redirect(f"/apidocs?url={schema_url}")
+    except Exception as e:
+        logging.error(f"Error redirecting to Swagger UI: {e}")
+        return abort(500, description="Internal server error")
