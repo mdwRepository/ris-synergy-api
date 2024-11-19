@@ -260,7 +260,7 @@ def before_request():
     Set the start time of the request
     """
     g.request_start_time = time.time()
-    g.request_time = lambda: "%.5fs" % (time.time() - g.request_start_time)
+    g.request_time = lambda: f"{time.time() - g.request_start_time:.5f}s"
 
 
 @app.after_request
