@@ -11,10 +11,11 @@ import os
 from flask import request, make_response, current_app, abort, jsonify
 from functools import wraps
 
+from app import is_sentry_enabled
 from app.auth import verify_token
 from app.exceptions import TokenError
 
-if os.getenv("SENTRY_DSN"):
+if is_sentry_enabled():
     import sentry_sdk
 
 
@@ -88,7 +89,7 @@ def keycloak_protected(f):
                 
             except TokenError as e:
                 # Log token-related errors
-                if os.getenv("SENTRY_DSN"):
+                if is_sentry_enabled():
                     # Skip logging this specific error to Sentry
                     if e.args[0] != "Authorization header missing or malformed":
                         sentry_sdk.capture_exception(e)
@@ -98,7 +99,7 @@ def keycloak_protected(f):
             
             except Exception as e:
                 # Handle unexpected errors
-                if os.getenv("SENTRY_DSN"):
+                if is_sentry_enabled():
                     sentry_sdk.capture_exception(e)
                 logging.error(f"Unexpected error during token verification: {e}")
                 response = {"error": "Internal server error"}
