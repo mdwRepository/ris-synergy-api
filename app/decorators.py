@@ -8,10 +8,14 @@ import logging
 import os
 
 
-from flask import request, make_response, current_app, abort
+from flask import request, make_response, current_app, abort, jsonify
 from functools import wraps
 
 from app.auth import verify_token
+from app.exceptions import TokenError
+
+if os.getenv("SENTRY_DSN"):
+    import sentry_sdk
 
 
 def set_theme(f):
@@ -80,10 +84,22 @@ def keycloak_protected(f):
 
                 token = auth_header.split(" ")[1]
                 verify_token(token)  # Verify the token with Keycloak
-
+                
+            except TokenError as e:
+                # Log token-related errors
+                if os.getenv("SENTRY_DSN"):
+                    sentry_sdk.capture_exception(e)
+                logging.error(f"Token error: {e}")
+                response = {"error": e.args[0]}
+                return jsonify(response), e.status_code
+            
             except Exception as e:
-                logging.error(f"Error verifying token: {e}")
-                abort(401, description="Unauthorized")
+                # Handle unexpected errors
+                if os.getenv("SENTRY_DSN"):
+                    sentry_sdk.capture_exception(e)
+                logging.error(f"Unexpected error during token verification: {e}")
+                response = {"error": "Internal server error"}
+                return jsonify(response), 500
 
         return f(*args, **kwargs)
 
