@@ -118,14 +118,16 @@ def create_app():
         secure_app(app)
 
         # Configure the Keycloak settings
-        if app.config["OIDC_CLIENT_ID"]:
-            app.config["OIDC_CLIENT_ID"] = os.getenv("OIDC_CLIENT_ID")
+        oidc_client_id = os.getenv("OIDC_CLIENT_ID")
+
+        if oidc_client_id and oidc_client_id.strip():  # Check if OIDC_CLIENT_ID exists and is not empty
+            app.config["OIDC_CLIENT_ID"] = oidc_client_id
             app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
             app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
             app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
             logging.info("Keycloak settings configured")
         else:
-            logging.info("Keycloak settings not configured")
+            logging.info("Keycloak settings not configured or empty")
 
         # Register Swagger (after blueprints)
         register_swagger(app)
