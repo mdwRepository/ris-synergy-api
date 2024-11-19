@@ -10,7 +10,7 @@ import json
 
 # from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-from flask import Flask, g
+from flask import Flask, g, Response
 from flasgger import Swagger
 from os import getenv
 
@@ -280,4 +280,23 @@ def apply_clickjacking_protection(response):
         )
         response.headers["Content-Security-Policy"] = "frame-ancestors 'self'"
     response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+@app.after_request
+def apply_csp(response: Response) -> Response:
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js; "
+        "https://code.jquery.com/jquery-3.3.1.slim.min.js https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js; "
+        "style-src 'self' https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css; "
+        "img-src 'self'; "
+        "font-src 'self' https://fonts.gstatic.com/s/oswald/v53/TK3_WkUHHAIjg75cFRf3bXL8LICs1_FvsUZiZQ.woff2; "
+        "frame-ancestors 'self'; "
+        "object-src 'none'; "
+        "connect-src 'self'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    )
+    response.headers['Content-Security-Policy'] = csp
     return response
