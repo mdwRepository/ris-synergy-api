@@ -116,6 +116,17 @@ def create_app():
         register_template_filters(app)
         register_blueprints(app)
         secure_app(app)
+
+        # Configure the Keycloak settings
+        if app.config["OIDC_CLIENT_ID"]:
+            app.config["OIDC_CLIENT_ID"] = os.getenv("OIDC_CLIENT_ID")
+            app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
+            app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
+            app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
+            logging.info("Keycloak settings configured")
+        else:
+            logging.info("Keycloak settings not configured")
+
         # Register Swagger (after blueprints)
         register_swagger(app)
         return app
@@ -210,14 +221,14 @@ def register_swagger(app):
                     # Use the blueprint's route for the OpenAPI spec
                     "route": "/ris-synergy/ris_synergy.json",
                     "rule_filter": lambda rule: True,  # include all routes
-                    "model_filter": lambda tag: True,   # include all models
+                    "model_filter": lambda tag: True,  # include all models
                 }
-            ]
+            ],
         }
 
         # Initialize Swagger with the custom config
         swagger = Swagger(app, config=swagger_config)
-        
+
         if swagger:
             print("Swagger UI registered")
 
@@ -237,7 +248,7 @@ def register_swagger(app):
     except Exception as e:
         print(f"Error: {e}")
         sys.exit("Error: registering Swagger UI")
-        
+
 
 def secure_app(app):
     """
