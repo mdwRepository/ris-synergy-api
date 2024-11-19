@@ -4,11 +4,14 @@
 # custom decorators for the Flask application                #
 ##############################################################
 
+import logging
 import os
 
 
-from flask import request, make_response
+from flask import request, make_response, current_app, abort
 from functools import wraps
+
+from app.auth import verify_token
 
 
 def set_theme(f):
@@ -59,3 +62,29 @@ def caching(seconds):
         return decorated_function
 
     return decorator
+
+
+def keycloak_protected(f):
+    """
+    A decorator to protect routes with Keycloak authentication.
+    Verifies the token only if Keycloak is enabled in the app configuration.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_app.config.get("KEYCLOAK_ENABLED", False):
+            try:
+                # Token extraction and verification
+                auth_header = request.headers.get("Authorization", None)
+                if not auth_header or not auth_header.startswith("Bearer "):
+                    abort(401, description="Authorization header missing or malformed")
+
+                token = auth_header.split(" ")[1]
+                verify_token(token)  # Verify the token with Keycloak
+
+            except Exception as e:
+                logging.error(f"Error verifying token: {e}")
+                abort(401, description="Unauthorized")
+
+        return f(*args, **kwargs)
+
+    return decorated_function
