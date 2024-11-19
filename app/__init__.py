@@ -68,6 +68,23 @@ if os.getenv("SENTRY_DSN"):
     )
 
 
+def configure_keycloak_settings(app):
+    """
+    Configure Keycloak settings if the required environment variables are set.
+    """
+    oidc_client_id = os.getenv("OIDC_CLIENT_ID")
+    if oidc_client_id and oidc_client_id.strip():  # Check if OIDC_CLIENT_ID exists and is not empty
+        app.config["OIDC_CLIENT_ID"] = oidc_client_id
+        app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
+        app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
+        app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
+        logging.info("Keycloak settings configured")
+        return True
+    else:
+        logging.info("Keycloak settings not configured or empty")
+        return False
+    
+
 # Initialize the app
 
 print("initializing dspace service app...")
@@ -117,17 +134,8 @@ def create_app():
         register_blueprints(app)
         secure_app(app)
 
-        # Configure the Keycloak settings
-        oidc_client_id = os.getenv("OIDC_CLIENT_ID")
-
-        if oidc_client_id and oidc_client_id.strip():  # Check if OIDC_CLIENT_ID exists and is not empty
-            app.config["OIDC_CLIENT_ID"] = oidc_client_id
-            app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
-            app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
-            app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
-            logging.info("Keycloak settings configured")
-        else:
-            logging.info("Keycloak settings not configured or empty")
+        # Configure Keycloak settings
+        app.config["KEYCLOAK_ENABLED"] = configure_keycloak_settings(app)
 
         # Register Swagger (after blueprints)
         register_swagger(app)
