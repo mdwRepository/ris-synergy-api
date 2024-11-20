@@ -334,6 +334,8 @@ def get_organigram():
     endpoint="ris-synergy.get_orgunit",
     methods=["GET"],
 )
+@keycloak_protected
+@produces("application/json")
 def get_orgunit(id):
     """Get specific OrgUnit by ID
     This endpoint serves the data for a specific organizational unit based on its ID.
