@@ -312,6 +312,9 @@ def get_organigram():
         ) as json_file:
             data = json.load(json_file)
             return jsonify(data)
+        
+    # Handle exceptions
+    # Log the error and return an error response
     except json.JSONDecodeError as json_error:
         logging.error(f"Error decoding JSON: {json_error}")
         return abort(500, description="Internal server error: JSON decoding error.")
@@ -323,6 +326,49 @@ def get_organigram():
         return abort(500, description="Internal server error")
 
 
+@blueprint.route(
+    "/ris-synergy/v1/orgUnits/<id>", methods=["GET"], endpoint="get_orgunit"
+)
+@swag_from(
+    ORGUNIT_OPENAPI_SPEC_PATH,
+    endpoint="ris-synergy.get_orgunit",
+    methods=["GET"],
+)
+def get_orgunit(id):
+    """Get specific OrgUnit by ID
+    This endpoint serves the data for a specific organizational unit based on its ID.
+    """
+    try:
+        # Fetch the latest organigram data
+        latest_file = get_latest_json_file()
+        if not latest_file:
+            return abort(404, description="No organigram data available.")
+        
+        with open(
+            os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8"
+        ) as json_file:
+            data = json.load(json_file)
+            
+        # Filter the data to find the org unit with the given ID
+        org_unit = next((item for item in data if item["id"] == id), None)
+        if not org_unit:
+            return abort(404, description=f"OrgUnit with ID {id} not found.")
+        
+        return jsonify(org_unit)
+
+    # Handle exceptions
+    # Log the error and return an error response
+    except json.JSONDecodeError as json_error:
+        logging.error(f"Error decoding JSON: {json_error}")
+        return abort(500, description="Internal server error: JSON decoding error.")
+    except FileNotFoundError as fnf_error:
+        logging.error(f"File not found: {fnf_error}")
+        return abort(500, description="Internal server error")
+    except Exception as e:
+        logging.error(f"Error fetching OrgUnit data: {e}")
+        return abort(500, description="Internal server error")
+
+
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
 @produces("application/json")
 def get_project_schema():
@@ -331,6 +377,7 @@ def get_project_schema():
     This endpoint serves the JSON schema for projects.
     """
     try:
+        # Open and read the JSON schema file
         with open(PROJECT_SCHEMA_PATH, "r", encoding="utf-8") as schema_file:
             schema = json.load(schema_file)
         return jsonify(schema)
