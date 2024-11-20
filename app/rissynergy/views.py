@@ -371,6 +371,46 @@ def get_orgunit(id):
         return abort(500, description="Internal server error")
 
 
+@blueprint.route(
+    "/ris-synergy/v1/orgUnits/organigram/<date>", methods=["GET"], endpoint="organigram_by_date"
+)
+@keycloak_protected
+@produces("application/json")
+def get_organigram_by_date(date):
+    """
+    Get Organigram Data for a Specific Date
+    This endpoint serves the organizational tree of the university for a specific date.
+    """
+    try:
+        # Validate date format (YYYY-MM-DD)
+        try:
+            datetime.datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            return abort(400, description="Invalid date format. Use YYYY-MM-DD.")
+
+        # Construct the filename based on the date
+        filename = f"organigram_{date}.json"
+        file_path = os.path.join(JSON_DIR, filename)
+
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            return abort(404, description=f"No organigram data available for {date}.")
+
+        # Read and return the content of the file
+        with open(file_path, "r", encoding="utf-8") as json_file:
+            data = json.load(json_file)
+            return jsonify(data)
+
+    # Handle exceptions
+    # Log the error and return an error response
+    except json.JSONDecodeError as json_error:
+        logging.error(f"Error decoding JSON: {json_error}")
+        return abort(500, description="Internal server error: JSON decoding error.")
+    except Exception as e:
+        logging.error(f"Error fetching organigram data for date {date}: {e}")
+        return abort(500, description="Internal server error")
+
+
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
 @produces("application/json")
 def get_project_schema():
