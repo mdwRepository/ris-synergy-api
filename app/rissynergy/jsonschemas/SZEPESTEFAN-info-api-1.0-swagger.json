@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5000/ris-synergy"
+      "url": "https://ris-synergy.mdw.ac.at/ris-synergy"
     }
   ],
   "tags": [

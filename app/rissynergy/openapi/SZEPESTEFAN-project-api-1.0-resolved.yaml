@@ -11,7 +11,7 @@ info:
     > ***FFG Mobilität der Zukunft:*** AAUPROJ1238 </br>
   version: "1.0"
 servers:
-  - url: http://127.0.0.1:5000/ris-synergy
+  - url: https://ris-synergy.mdw.ac.at/ris-synergy
 tags:
   - name: Projects
     description: Endpoints for Project Data
