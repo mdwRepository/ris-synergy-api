@@ -7,7 +7,7 @@ info:
     > ***OrgUnit:*** AAUORG1234
   version: "1.0"
 servers:
-  - url: https://ris-synergy.mdw.ac.at/ris-synergy
+  - url: {{SERVER_URL}}/ris-synergy
 tags:
   - name: OrgUnits
     description: Endpoints for Organizational Units

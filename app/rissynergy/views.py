@@ -34,6 +34,9 @@ logging.debug("static folder: ", static_folder)
 # Get the supported API version from the .env file
 SUPPORTED_API_VERSION = os.getenv("SUPPORTED_API_VERSION", "1.0")
 
+# Environment variable for server URL
+OPEN_API_SERVER_URL = os.getenv("OPEN_API_SERVER_URL", "https://default-url.com")
+
 # Path where the JSON files are stored
 JSON_DIR = os.path.join(os.getcwd(), "app", "rissynergy", "organigram_data")
 
@@ -151,6 +154,28 @@ def get_latest_json_file():
     except Exception as e:
         logging.error(f"Error getting latest JSON file: {e}")
         return None
+    
+    
+def replace_placeholder_in_file(file_path, placeholder="{{SERVER_URL}}", replacement=OPEN_API_SERVER_URL):
+    """
+    Replace a placeholder in a JSON or YAML file with the given replacement.
+    """
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        content = content.replace(placeholder, replacement)
+        if file_path.endswith(".json"):
+            return json.loads(content)
+        elif file_path.endswith(".yaml") or file_path.endswith(".yml"):
+            return yaml.safe_load(content)
+        else:
+            raise ValueError("Unsupported file type")
+    except FileNotFoundError as e:
+        logging.error(f"File not found: {file_path}")
+        return None
+    except Exception as e:
+        logging.error(f"Error processing file {file_path}: {e}")
+        return None
 
 
 @blueprint.route("/ris-synergy/ris_synergy.json", methods=["GET"])
@@ -161,36 +186,26 @@ def get_ris_synergy_schema():
     This endpoint serves the JSON schema for the RIS Synergy endpoint.
     """
     try:
-        # Open and read the JSON schema file
-        with open(RIS_SYNERGY_SCHEMA_PATH, "r") as schema_file:
-            schema = json.load(schema_file)
-
-        # Return the schema as a JSON response
+        schema = replace_placeholder_in_file(RIS_SYNERGY_SCHEMA_PATH)
+        if schema is None:
+            return abort(500, description="Internal server error")
         return jsonify(schema)
-
-    except FileNotFoundError:
-        logging.error(f"JSON schema file not found: {RIS_SYNERGY_SCHEMA_PATH}")
-        return abort(404, description="JSON schema file not found")
-
-    except json.JSONDecodeError as e:
-        logging.error(f"Error decoding JSON schema: {e}")
-        return abort(500, description="Error decoding JSON schema")
-
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
         return abort(500, description="Internal server error")
 
 
+
 @blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
-@produces("application/json")
 def get_info_schema():
     """
     Get Info JSON Schema
-    This endpoint serves the JSON schema for the info endpoint.
+    Dynamically replaces placeholders with configured values.
     """
     try:
-        with open(INFO_SCHEMA_PATH, "r", encoding="utf-8") as schema_file:
-            schema = json.load(schema_file)
+        schema = replace_placeholder_in_file(INFO_SCHEMA_PATH)
+        if schema is None:
+            return abort(500, description="Internal server error")
         return jsonify(schema)
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
@@ -213,9 +228,7 @@ def show_info_schema_apidocs():
         return abort(500, description="Internal server error")
 
 
-@blueprint.route(
-    "/ris-synergy/v1/info", methods=["GET"], endpoint="info"
-)
+@blueprint.route("/ris-synergy/v1/info", methods=["GET"], endpoint="info")
 @swag_from(
     ORGUNIT_OPENAPI_SPEC_PATH,
     endpoint="ris-synergy.info",
@@ -227,15 +240,10 @@ def get_info():
     This endpoint serves the info data.
     """
     try:
-        with open(INFO_DATA_PATH, "r", encoding="utf-8") as json_file:
-            data = json.load(json_file)
-            return jsonify(data)
-    except json.JSONDecodeError as json_error:
-        logging.error(f"Error decoding JSON: {json_error}")
-        return abort(500, description="Internal server error: JSON decoding error.")
-    except FileNotFoundError as fnf_error:
-        logging.error(f"File not found: {fnf_error}")
-        return abort(500, description="Internal server error")
+        data = replace_placeholder_in_file(INFO_DATA_PATH)
+        if data is None:
+            return abort(500, description="Internal server error")
+        return jsonify(data)
     except Exception as e:
         logging.error(f"Error fetching info data: {e}")
         return abort(500, description="Internal server error")
@@ -249,8 +257,9 @@ def get_orgunit_schema():
     This endpoint serves the JSON schema for organizational units.
     """
     try:
-        with open(ORGUNIT_SCHEMA_PATH, "r", encoding="utf-8") as schema_file:
-            schema = json.load(schema_file)
+        schema = replace_placeholder_in_file(ORGUNIT_SCHEMA_PATH)
+        if schema is None:
+            return abort(500, description="Internal server error")
         return jsonify(schema)
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
@@ -430,9 +439,9 @@ def get_project_schema():
     This endpoint serves the JSON schema for projects.
     """
     try:
-        # Open and read the JSON schema file
-        with open(PROJECT_SCHEMA_PATH, "r", encoding="utf-8") as schema_file:
-            schema = json.load(schema_file)
+        schema = replace_placeholder_in_file(PROJECT_SCHEMA_PATH)
+        if schema is None:
+            return abort(500, description="Internal server error")
         return jsonify(schema)
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")

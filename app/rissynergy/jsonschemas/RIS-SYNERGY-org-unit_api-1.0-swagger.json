@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://ris-synergy.mdw.ac.at/ris-synergy"
+      "url": "{{SERVER_URL}}/ris-synergy"
     }
   ],
   "tags": [

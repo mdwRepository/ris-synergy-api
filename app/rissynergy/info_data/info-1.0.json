@@ -6,13 +6,13 @@
                 "name": "ORGANIGRAM",
                 "majorVersion": 1,
                 "minorVersion": 0,
-                "url": "https://ris-synergy.mdw.ac.at/ris-synergy/v1/orgUnits/organigram"
+                "url": "{{SERVER_URL}}/ris-synergy/v1/orgUnits/organigram"
             },
             {
                 "name": "ORGUNIT",
                 "majorVersion": 1,
                 "minorVersion": 0,
-                "url": "https://ris-synergy.mdw.ac.at/ris-synergy/v1/orgUnits/{id}"
+                "url": "{{SERVER_URL}}/ris-synergy/v1/orgUnits/{id}"
             }
         ]
     }
