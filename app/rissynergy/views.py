@@ -88,6 +88,9 @@ PROJECT_OPENAPI_SPEC_PATH = os.path.join(
     "openapi",
     "SZEPESTEFAN-project-api-1.0-resolved.yaml",
 )
+INFO_DATA_PATH = os.path.join(
+    os.getcwd(), "app", "rissynergy", "info_data", "info-1.0.json"
+)
 
 
 # create a blueprint
@@ -198,6 +201,34 @@ def show_info_schema_apidocs():
         logging.error(f"Error redirecting to Swagger UI: {e}")
         return abort(500, description="Internal server error")
 
+
+@blueprint.route(
+    "/ris-synergy/v1/info", methods=["GET"], endpoint="info"
+)
+@swag_from(
+    ORGUNIT_OPENAPI_SPEC_PATH,
+    endpoint="ris-synergy.info",
+    methods=["GET"],
+)
+@produces("application/json")
+def get_info():
+    """
+    This endpoint serves the info data.
+    """
+    try:
+        with open(INFO_DATA_PATH, "r", encoding="utf-8") as json_file:
+            data = json.load(json_file)
+            return jsonify(data)
+    except json.JSONDecodeError as json_error:
+        logging.error(f"Error decoding JSON: {json_error}")
+        return abort(500, description="Internal server error: JSON decoding error.")
+    except FileNotFoundError as fnf_error:
+        logging.error(f"File not found: {fnf_error}")
+        return abort(500, description="Internal server error")
+    except Exception as e:
+        logging.error(f"Error fetching info data: {e}")
+        return abort(500, description="Internal server error")
+    
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
 @produces("application/json")
