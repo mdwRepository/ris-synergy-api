@@ -31,6 +31,9 @@ static_folder = os.getenv("STATIC_FOLDER") or None
 logging.debug("static url path: ", static_url_path)
 logging.debug("static folder: ", static_folder)
 
+# Get the supported API version from the .env file
+SUPPORTED_API_VERSION = os.getenv("SUPPORTED_API_VERSION", "1.0")
+
 # Path where the JSON files are stored
 JSON_DIR = os.path.join(os.getcwd(), "app", "rissynergy", "organigram_data")
 
@@ -45,51 +48,59 @@ ORGUNIT_SCHEMA_PATH = os.path.join(
     "app",
     "rissynergy",
     "jsonschemas",
-    "SZEPESTEFAN-org-unit_api-1.0-resolved.json",
+    f"SZEPESTEFAN-org-unit_api-{SUPPORTED_API_VERSION}-resolved.json",
 )
 INFO_SCHEMA_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "jsonschemas",
-    "SZEPESTEFAN-info-api-1.0-resolved.json",
+    f"SZEPESTEFAN-info-api-{SUPPORTED_API_VERSION}-resolved.json",
 )
 FUNDING_SCHEMA_PATH = os.path.join(
-    os.getcwd(), "app", "rissynergy", "jsonschemas", "funding-v.1.0.0.json"
+    os.getcwd(),
+    "app",
+    "rissynergy",
+    "jsonschemas",
+    f"funding-v.{SUPPORTED_API_VERSION}.json",
 )
 PROJECT_SCHEMA_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "jsonschemas",
-    "SZEPESTEFAN-project-api-1.0-resolved.json",
+    f"SZEPESTEFAN-project-api-{SUPPORTED_API_VERSION}-resolved.json",
 )
 ORGUNIT_OPENAPI_SPEC_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "openapi",
-    "SZEPESTEFAN-org-unit_api-1.0-resolved.yaml",
+    f"SZEPESTEFAN-org-unit_api-{SUPPORTED_API_VERSION}-resolved.yaml",
 )
 INFO_OPENAPI_SPEC_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "openapi",
-    "SZEPESTEFAN-info-api-1.0-resolved.yaml",
+    f"SZEPESTEFAN-info-api-{SUPPORTED_API_VERSION}-resolved.yaml",
 )
 FUNDING_OPENAPI_SPEC_PATH = os.path.join(
-    os.getcwd(), "app", "rissynergy", "openapi", "funding.yaml"
+    os.getcwd(),
+    "app",
+    "rissynergy",
+    "openapi",
+    "funding.yaml"  # Assuming this doesn't depend on version
 )
 PROJECT_OPENAPI_SPEC_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "openapi",
-    "SZEPESTEFAN-project-api-1.0-resolved.yaml",
+    f"SZEPESTEFAN-project-api-{SUPPORTED_API_VERSION}-resolved.yaml",
 )
 INFO_DATA_PATH = os.path.join(
-    os.getcwd(), "app", "rissynergy", "info_data", "info-1.0.json"
+    os.getcwd(), "app", "rissynergy", "info_data", f"info-{SUPPORTED_API_VERSION}.json"
 )
 
 
