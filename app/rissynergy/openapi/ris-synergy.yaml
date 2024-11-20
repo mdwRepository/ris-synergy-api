@@ -4,7 +4,7 @@ info:
   version: "1.0"
   description: RIS Synergy Api
 servers:
-  - url: http://127.0.0.1:5000/ris-synergy
+  - url: https://ris-synergy.mdw.ac.at/ris-synerg
 tags:
   - name: Info
     description: Information about Endpoints
