@@ -48,14 +48,14 @@ ORGUNIT_SCHEMA_PATH = os.path.join(
     "app",
     "rissynergy",
     "jsonschemas",
-    f"SZEPESTEFAN-org-unit_api-{SUPPORTED_API_VERSION}-resolved.json",
+    f"RIS-SYNERGY-org-unit_api-{SUPPORTED_API_VERSION}-resolved.json",
 )
 INFO_SCHEMA_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "jsonschemas",
-    f"SZEPESTEFAN-info-api-{SUPPORTED_API_VERSION}-resolved.json",
+    f"RIS-SYNERGY-info-api-{SUPPORTED_API_VERSION}-resolved.json",
 )
 FUNDING_SCHEMA_PATH = os.path.join(
     os.getcwd(),
@@ -69,21 +69,21 @@ PROJECT_SCHEMA_PATH = os.path.join(
     "app",
     "rissynergy",
     "jsonschemas",
-    f"SZEPESTEFAN-project-api-{SUPPORTED_API_VERSION}-resolved.json",
+    f"RIS-SYNERGY-project-api-{SUPPORTED_API_VERSION}-resolved.json",
 )
 ORGUNIT_OPENAPI_SPEC_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "openapi",
-    f"SZEPESTEFAN-org-unit_api-{SUPPORTED_API_VERSION}-resolved.yaml",
+    f"RIS-SYNERGY-org-unit_api-{SUPPORTED_API_VERSION}-resolved.yaml",
 )
 INFO_OPENAPI_SPEC_PATH = os.path.join(
     os.getcwd(),
     "app",
     "rissynergy",
     "openapi",
-    f"SZEPESTEFAN-info-api-{SUPPORTED_API_VERSION}-resolved.yaml",
+    f"RIS-SYNERGY-info-api-{SUPPORTED_API_VERSION}-resolved.yaml",
 )
 FUNDING_OPENAPI_SPEC_PATH = os.path.join(
     os.getcwd(),
@@ -97,7 +97,7 @@ PROJECT_OPENAPI_SPEC_PATH = os.path.join(
     "app",
     "rissynergy",
     "openapi",
-    f"SZEPESTEFAN-project-api-{SUPPORTED_API_VERSION}-resolved.yaml",
+    f"RIS-SYNERGY-project-api-{SUPPORTED_API_VERSION}-resolved.yaml",
 )
 INFO_DATA_PATH = os.path.join(
     os.getcwd(), "app", "rissynergy", "info_data", f"info-{SUPPORTED_API_VERSION}.json"
