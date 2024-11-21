@@ -20,6 +20,7 @@ def verify_token(token):
         data={"token": token},
         auth=(client_id, client_secret),
         headers={"Content-Type": "application/x-www-form-urlencoded"},
+        timeout=5,
     )
 
     # Check if the request was successful otherwise raise an error
