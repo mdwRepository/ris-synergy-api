@@ -21,6 +21,7 @@ from flask import (
 from flask_negotiate import produces
 from datetime import datetime
 from flasgger import swag_from
+from pathlib import Path
 
 from app.decorators import keycloak_protected
 
@@ -407,17 +408,23 @@ def get_organigram_by_date(date):
             datetime.datetime.strptime(date, "%Y-%m-%d")
         except ValueError:
             return abort(400, description="Invalid date format. Use YYYY-MM-DD.")
+        
+        # Resolve the JSON directory path
+        BASE_DIR = Path(JSON_DIR).resolve()
 
-        # Construct the filename based on the date
-        filename = f"organigram_{date}.json"
-        file_path = os.path.join(JSON_DIR, filename)
+        # Construct the file path
+        file_path = (BASE_DIR / f"organigram_{date}.json").resolve()
+        
+        # Check if the resolved path is still within BASE_DIR
+        if not str(file_path).startswith(str(BASE_DIR)):
+            return abort(400, description="Invalid date input.")
 
-        # Check if the file exists
-        if not os.path.exists(file_path):
+        # Ensure the file exists and is accessible
+        if not file_path.is_file():
             return abort(404, description=f"No organigram data available for {date}.")
 
         # Read and return the content of the file
-        with open(file_path, "r", encoding="utf-8") as json_file:
+        with file_path.open("r", encoding="utf-8") as json_file:
             data = json.load(json_file)
             return jsonify(data)
 
