@@ -5,6 +5,7 @@
 import logging
 import json
 import os
+import re
 import yaml
 
 from flask import (
@@ -22,6 +23,7 @@ from flask_negotiate import produces
 from datetime import datetime
 from flasgger import swag_from
 from pathlib import Path
+from werkzeug.utils import secure_filename
 
 from app.decorators import keycloak_protected
 
@@ -403,17 +405,19 @@ def get_organigram_by_date(date):
     This endpoint serves the organizational tree of the university for a specific date.
     """
     try:
-        # Validate date format (YYYY-MM-DD)
-        try:
-            datetime.datetime.strptime(date, "%Y-%m-%d")
-        except ValueError:
+        # Validate the date format (YYYY-MM-DD) 
+        # Ensure the date parameter only contains valid characters
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', date):
             return abort(400, description="Invalid date format. Use YYYY-MM-DD.")
-        
+               
         # Resolve the JSON directory path
         BASE_DIR = Path(JSON_DIR).resolve()
 
+        # Sanitize the filename part
+        safe_date = secure_filename(f"organigram_{date}.json")
+
         # Construct the file path
-        file_path = (BASE_DIR / f"organigram_{date}.json").resolve()
+        file_path = os.path.normpath(BASE_DIR / safe_date).resolve()
         
         # Check if the resolved path is still within BASE_DIR
         if not str(file_path).startswith(str(BASE_DIR)):
