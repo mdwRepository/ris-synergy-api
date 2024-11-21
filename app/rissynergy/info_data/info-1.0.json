@@ -1,0 +1,19 @@
+{
+    "endpoints": {
+        "funding": [],
+        "orgUnit": [
+            {
+                "name": "ORGANIGRAM",
+                "majorVersion": 1,
+                "minorVersion": 0,
+                "url": "{{SERVER_URL}}/ris-synergy/v1/orgUnits/organigram"
+            },
+            {
+                "name": "ORGUNIT",
+                "majorVersion": 1,
+                "minorVersion": 0,
+                "url": "{{SERVER_URL}}/ris-synergy/v1/orgUnits/{id}"
+            }
+        ]
+    }
+}

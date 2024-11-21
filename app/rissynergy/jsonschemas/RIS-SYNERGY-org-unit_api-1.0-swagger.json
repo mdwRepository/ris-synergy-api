@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5000/ris-synergy"
+      "url": "{{SERVER_URL}}/ris-synergy"
     }
   ],
   "tags": [

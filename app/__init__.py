@@ -56,17 +56,37 @@ if check_if_env_file_exists():
 if not check_if_required_env_variables_are_set():
     sys.exit("Error: required environment variables not set")
 
-# if sentry is enabled, initialize it
-if os.getenv("SENTRY_DSN"):
-    import sentry_sdk
 
+# Sentry utility function
+def is_sentry_enabled():
+    return bool(os.getenv("SENTRY_DSN"))
+
+
+# Initialize Sentry if enabled
+if is_sentry_enabled():
+    import sentry_sdk
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        traces_sample_rate=1.0,
+        traces_sample_rate=1.0,  # Capture 100% of transactions for performance monitoring
     )
 
+
+def configure_keycloak_settings(app):
+    """
+    Configure Keycloak settings if the required environment variables are set.
+    """
+    oidc_client_id = os.getenv("OIDC_CLIENT_ID")
+    if oidc_client_id and oidc_client_id.strip():  # Check if OIDC_CLIENT_ID exists and is not empty
+        app.config["OIDC_CLIENT_ID"] = oidc_client_id
+        app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
+        app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
+        app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
+        logging.info("Keycloak settings configured")
+        return True
+    else:
+        logging.info("Keycloak settings not configured or empty")
+        return False
+    
 
 # Initialize the app
 
@@ -80,9 +100,9 @@ try:
     print("static folder: ", static_folder)
 
 except ValueError as e:
-    print(f"Error: ", e)
+    print("Error: ", e)
 except Exception as e:
-    print(f"Error: ", e)
+    print("Error: ", e)
 
 
 def create_app():
@@ -116,11 +136,15 @@ def create_app():
         register_template_filters(app)
         register_blueprints(app)
         secure_app(app)
+
+        # Configure Keycloak settings
+        app.config["KEYCLOAK_ENABLED"] = configure_keycloak_settings(app)
+
         # Register Swagger (after blueprints)
         register_swagger(app)
         return app
     except Exception as e:
-        print(f"Error: ", e)
+        print("Error: ", e)
         sys.exit("Error: creating app")
 
 
@@ -141,7 +165,7 @@ def configure_logger(app):
         if setup_stream_handler() is not None:
             app.logger.addHandler(setup_stream_handler())
     except Exception as e:
-        print(f"Error: ", e)
+        print("Error: ", e)
         sys.exit("Error: configuring logger")
 
 
@@ -179,7 +203,7 @@ def register_blueprints(app):
                 except ImportError as e:
                     print(f"Failed to import or register blueprint: {e}")
                 except Exception as e:
-                    print(f"Error: ", e)
+                    print("Error: ", e)
                     sys.exit("Error: registering blueprints")
 
             print("Available routes in the blueprints:")
@@ -190,7 +214,7 @@ def register_blueprints(app):
     except ImportError as e:
         print(f"Failed to import or register blueprint: {e}")
     except Exception as e:
-        print(f"Error: ", e)
+        print("Error: ", e)
         sys.exit("Error: registering blueprints")
 
 
@@ -210,14 +234,14 @@ def register_swagger(app):
                     # Use the blueprint's route for the OpenAPI spec
                     "route": "/ris-synergy/ris_synergy.json",
                     "rule_filter": lambda rule: True,  # include all routes
-                    "model_filter": lambda tag: True,   # include all models
+                    "model_filter": lambda tag: True,  # include all models
                 }
-            ]
+            ],
         }
 
         # Initialize Swagger with the custom config
         swagger = Swagger(app, config=swagger_config)
-        
+
         if swagger:
             print("Swagger UI registered")
 
@@ -237,7 +261,7 @@ def register_swagger(app):
     except Exception as e:
         print(f"Error: {e}")
         sys.exit("Error: registering Swagger UI")
-        
+
 
 def secure_app(app):
     """
@@ -260,7 +284,7 @@ def before_request():
     Set the start time of the request
     """
     g.request_start_time = time.time()
-    g.request_time = lambda: "%.5fs" % (time.time() - g.request_start_time)
+    g.request_time = lambda: f"{time.time() - g.request_start_time:.5f}s"
 
 
 @app.after_request
