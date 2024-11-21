@@ -296,54 +296,44 @@ def show_orgunits_schema_apidocs():
 @keycloak_protected
 @produces("application/json")
 def get_organigram():
-    """Get Organigram Data
+    """
+    Get Organigram Data
     This endpoint serves the organizational tree of the university.
     """
     try:
+        # Replace placeholder in OpenAPI spec file
+        openapi_spec = replace_placeholder_in_file(ORGUNIT_OPENAPI_SPEC_PATH)
+        if openapi_spec is None:
+            logging.error(f"Failed to load or replace placeholders in OpenAPI spec file: {ORGUNIT_OPENAPI_SPEC_PATH}")
+            return abort(500, description="Internal server error: Failed to process OpenAPI spec file.")
 
-        # Debug to check if the file exists
-        if not os.path.exists(ORGUNIT_OPENAPI_SPEC_PATH):
-            logging.error(f"OpenAPI spec file not found: {ORGUNIT_OPENAPI_SPEC_PATH}")
-            return abort(
-                500, description="Internal server error: OpenAPI spec file not found."
-            )
-
-        # Log the loaded OpenAPI spec path and content (for debugging purposes)
-        with open(ORGUNIT_OPENAPI_SPEC_PATH, "r", encoding="utf-8") as f:
-            spec_content = f.read()
-            logging.debug(f"Loaded OpenAPI Spec: {spec_content}")
-
-        # Check if the OpenAPI spec file is a valid YAML file
-        if not is_valid_yaml(ORGUNIT_OPENAPI_SPEC_PATH):
-            return abort(
-                500,
-                description="Internal server error: Invalid YAML format in OpenAPI spec.",
-            )
+        # Log the loaded OpenAPI spec for debugging (optional)
+        logging.debug(f"Processed OpenAPI Spec: {openapi_spec}")
 
     except Exception as e:
         logging.error(f"Error loading OpenAPI spec: {e}")
-        return abort(500, description="Internal server error")
+        return abort(500, description="Internal server error while processing OpenAPI spec.")
 
     try:
         # Fetch the latest organigram data
         latest_file = get_latest_json_file()
-        logging.debug("latest_file: ", latest_file)
+        logging.debug(f"Latest organigram data file: {latest_file}")
         if not latest_file:
             return abort(404, description="No organigram data available.")
+        
+        # Load the organigram data
         with open(
             os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8"
         ) as json_file:
             data = json.load(json_file)
             return jsonify(data)
-        
-    # Handle exceptions
-    # Log the error and return an error response
+
     except json.JSONDecodeError as json_error:
         logging.error(f"Error decoding JSON: {json_error}")
         return abort(500, description="Internal server error: JSON decoding error.")
     except FileNotFoundError as fnf_error:
         logging.error(f"File not found: {fnf_error}")
-        return abort(500, description="Internal server error")
+        return abort(500, description="Internal server error: Organigram file not found.")
     except Exception as e:
         logging.error(f"Error fetching organigram data or Swagger definition: {e}")
         return abort(500, description="Internal server error")
