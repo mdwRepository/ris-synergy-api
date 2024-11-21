@@ -25,7 +25,7 @@ from flasgger import swag_from
 from pathlib import Path
 from werkzeug.utils import secure_filename
 
-from app.decorators import keycloak_protected
+from app.decorators import keycloak_protected, conditional_produces
 
 
 static_url_path = os.getenv("STATIC_URL_PATH") or None
@@ -109,8 +109,6 @@ INFO_DATA_PATH = os.path.join(
     os.getcwd(), "app", "rissynergy", "info_data", f"info-{SUPPORTED_API_VERSION}.json"
 )
 
-# content negotiation toggler
-ENFORCE_CONTENT_NEGOTIATION = False
 
 # create a blueprint
 blueprint = Blueprint(
@@ -181,14 +179,6 @@ def replace_placeholder_in_file(file_path, placeholder="{{SERVER_URL}}", replace
     except Exception as e:
         logging.error(f"Error processing file {file_path}: {e}")
         return None
-
-
-def conditional_produces(mime_type):
-    def decorator(func):
-        if ENFORCE_CONTENT_NEGOTIATION:
-            return produces(mime_type)(func)
-        return func
-    return decorator
 
 
 @blueprint.route("/ris-synergy/ris_synergy.json", methods=["GET"])
