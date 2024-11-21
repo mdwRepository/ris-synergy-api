@@ -8,8 +8,8 @@ import logging
 import os
 
 
-from flask import request, make_response, current_app, abort, jsonify
 from functools import wraps
+from flask import request, make_response, current_app, abort, jsonify
 
 from app import is_sentry_enabled
 from app.auth import verify_token
@@ -27,8 +27,10 @@ def set_theme(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        request.theme = os.getenv("THEME", "default")  # Adding theme to request context
-        request.portal_name = os.getenv("PORTAL_NAME", "RIS Synergy") # Adding portal name to request context
+        # Adding theme to request context
+        request.theme = os.getenv("THEME", "default")
+        # Adding portal name to request context
+        request.portal_name = os.getenv("PORTAL_NAME", "RIS Synergy")
         return f(*args, **kwargs)
 
     return decorated_function
@@ -93,17 +95,17 @@ def keycloak_protected(f):
                     # Skip logging this specific error to Sentry
                     if e.args[0] != "Authorization header missing or malformed":
                         sentry_sdk.capture_exception(e)
-                logging.error(f"Token error: {e}")
+                logging.error("Token error: %s", e)
                 response = {"error": e.args[0]}
                 return jsonify(response), e.status_code
             
-            except Exception as e:
-                # Handle unexpected errors
+            except (KeyError, ValueError) as e:
+                # Handle specific errors
                 if is_sentry_enabled():
                     sentry_sdk.capture_exception(e)
-                logging.error(f"Unexpected error during token verification: {e}")
-                response = {"error": "Internal server error"}
-                return jsonify(response), 500
+                logging.error("Error during token verification: %s", e)
+                response = {"error": str(e)}
+                return jsonify(response), 400
 
         return f(*args, **kwargs)
 
