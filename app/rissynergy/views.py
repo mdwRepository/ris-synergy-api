@@ -109,6 +109,8 @@ INFO_DATA_PATH = os.path.join(
     os.getcwd(), "app", "rissynergy", "info_data", f"info-{SUPPORTED_API_VERSION}.json"
 )
 
+# content negotiation toggler
+ENFORCE_CONTENT_NEGOTIATION = False
 
 # create a blueprint
 blueprint = Blueprint(
@@ -181,8 +183,16 @@ def replace_placeholder_in_file(file_path, placeholder="{{SERVER_URL}}", replace
         return None
 
 
+def conditional_produces(mime_type):
+    def decorator(func):
+        if ENFORCE_CONTENT_NEGOTIATION:
+            return produces(mime_type)(func)
+        return func
+    return decorator
+
+
 @blueprint.route("/ris-synergy/ris_synergy.json", methods=["GET"])
-@produces("application/json")
+@conditional_produces("application/json")
 def get_ris_synergy_schema():
     """
     Get RIS Synergy JSON Schema
@@ -200,6 +210,7 @@ def get_ris_synergy_schema():
 
 
 @blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
+@conditional_produces("application/json")
 def get_info_schema():
     """
     Get Info JSON Schema
@@ -237,7 +248,7 @@ def show_info_schema_apidocs():
     endpoint="ris-synergy.info",
     methods=["GET"],
 )
-@produces("application/json")
+@conditional_produces("application/json")
 def get_info():
     """
     This endpoint serves the info data.
@@ -253,7 +264,7 @@ def get_info():
     
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
-@produces("application/json")
+@conditional_produces("application/json")
 def get_orgunit_schema():
     """
     Get OrgUnit JSON Schema
@@ -294,7 +305,7 @@ def show_orgunits_schema_apidocs():
     methods=["GET"],
 )
 @keycloak_protected
-@produces("application/json")
+@conditional_produces("application/json")
 def get_organigram():
     """Get Organigram Data
     This endpoint serves the organizational tree of the university.
@@ -358,7 +369,7 @@ def get_organigram():
     methods=["GET"],
 )
 @keycloak_protected
-@produces("application/json")
+@conditional_produces("application/json")
 def get_orgunit(id):
     """Get specific OrgUnit by ID
     This endpoint serves the data for a specific organizational unit based on its ID.
@@ -398,7 +409,7 @@ def get_orgunit(id):
     "/ris-synergy/v1/orgUnits/organigram/<date>", methods=["GET"], endpoint="organigram_by_date"
 )
 @keycloak_protected
-@produces("application/json")
+@conditional_produces("application/json")
 def get_organigram_by_date(date):
     """
     Get Organigram Data for a Specific Date
@@ -443,7 +454,7 @@ def get_organigram_by_date(date):
 
 
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
-@produces("application/json")
+@conditional_produces("application/json")
 def get_project_schema():
     """
     Get Project JSON Schema
