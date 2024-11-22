@@ -66,15 +66,13 @@ def set_log_level():
     # get the log level from the environment, default to INFO
     log_level_env = os.getenv("LOG_LEVEL", "INFO")
     print(f"Info: log level set to {log_level_env}")
-    if log_level_env == "DEBUG":
-        log_level = logging.DEBUG
-    elif log_level_env == "INFO":
-        log_level = logging.INFO
-    elif log_level_env == "WARNING":
-        log_level = logging.WARNING
-    elif log_level_env == "ERROR":
-        log_level = logging.ERROR
-
+    log_levels = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR
+    }
+    log_level = log_levels.get(log_level_env, logging.INFO)
     return log_level
 
 
