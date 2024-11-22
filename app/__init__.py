@@ -240,7 +240,6 @@ def register_extensions(flask_app):
     Register extensions with the app.
     """
     cors.init_app(flask_app)
-    return None
 
 
 def register_blueprints(flask_app):
@@ -258,23 +257,26 @@ def register_blueprints(flask_app):
         # load blueprints from the environment variable ENABLED_BLUEPRINTS
         enabled_blueprints = getenv("ENABLED_BLUEPRINTS")
 
-        # register the blueprints
-        if enabled_blueprints:
-            print("Enabled blueprints: ", enabled_blueprints)
-            for blueprint_name in enabled_blueprints.split(","):
-                try:
-                    blueprint = __import__(f"app.{blueprint_name}.views", fromlist=[""])
-                    flask_app.register_blueprint(blueprint.blueprint)
-                    print(f"Registered blueprint: {blueprint_name}")
-                except ImportError as e:
-                    print(f"Failed to import or register blueprint: {e}")
-                except Exception as e:
-                    print("Error: ", e)
-                    sys.exit("Error: registering blueprints")
+        if not enabled_blueprints:
+            print("No additional blueprints enabled.")
+            return
 
-            print("Available routes in the blueprints:")
-            for rule in flask_app.url_map.iter_rules():
-                print(f"{rule.rule} -> {rule.endpoint}")
+        # register the blueprints
+        print("Enabled blueprints: ", enabled_blueprints)
+        for blueprint_name in enabled_blueprints.split(","):
+            try:
+                blueprint = __import__(f"app.{blueprint_name}.views", fromlist=[""])
+                flask_app.register_blueprint(blueprint.blueprint)
+                print(f"Registered blueprint: {blueprint_name}")
+            except ImportError as e:
+                print(f"Failed to import or register blueprint: {e}")
+            except Exception as e:
+                print("Error: ", e)
+                sys.exit("Error: registering blueprints")
+
+        print("Available routes in the blueprints:")
+        for rule in flask_app.url_map.iter_rules():
+            print(f"{rule.rule} -> {rule.endpoint}")
 
         return None
     except ImportError as e:
