@@ -321,6 +321,7 @@ def register_swagger(app):
             # Log registered endpoints that are documented by Swagger
             print("Endpoints documented by Swagger:")
             for rule in app.url_map.iter_rules():
+                # Check if the rule is for Swagger UI
                 if "swagger" in rule.endpoint:
                     print(f"{rule.endpoint}: {rule.rule}")
 
@@ -351,6 +352,7 @@ def before_request():
     """
     Set the start time of the request
     """
+    # Set the start time of the request
     g.request_start_time = time.time()
     g.request_time = lambda: f"{time.time() - g.request_start_time:.5f}s"
 
@@ -360,16 +362,23 @@ def apply_clickjacking_protection(response):
     """
     Apply clickjacking protection to all responses
     """
+    # Set security headers to prevent clickjacking
+    # env var ALLOWED_SOURCES can be set to allow framing from specific sources
     allowed_sources = os.getenv("ALLOWED_SOURCES")
     if allowed_sources:
+        # Allow framing from specific sources
+        # set response headers to allow framing from the specified sources
         response.headers["X-Frame-Options"] = f"ALLOW-FROM  {allowed_sources}"
         response.headers["Content-Security-Policy"] = (
             f"frame-ancestors {allowed_sources}"
         )
     else:
         response.headers["X-Frame-Options"] = (
-            "SAMEORIGIN"  # Or "DENY" if you don't want to allow framing even from the same origin
+            # "SAMEORIGIN" to allow framing from the same origin
+            # Or "DENY" if you don't want to allow framing even from the same origin
+            "SAMEORIGIN"
         )
         response.headers["Content-Security-Policy"] = "frame-ancestors 'self'"
+    # Prevent MIME sniffing
     response.headers["X-Content-Type-Options"] = "nosniff"
     return response
