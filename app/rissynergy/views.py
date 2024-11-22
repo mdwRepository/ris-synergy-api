@@ -225,8 +225,7 @@ def replace_placeholder_in_file(
             return json.loads(content)
         elif file_path.endswith(".yaml") or file_path.endswith(".yml"):
             return yaml.safe_load(content)
-        else:
-            raise ValueError("Unsupported file type")
+        raise ValueError("Unsupported file type")
     except FileNotFoundError:
         logging.error("File not found: %s", file_path)
         return None
@@ -414,7 +413,8 @@ def get_organigram():
 @keycloak_protected
 @conditional_produces("application/json")
 def get_orgunit(id):
-    """Get specific OrgUnit by ID
+    """
+    Get specific OrgUnit by ID
     This endpoint serves the data for a specific organizational unit based on its ID.
     """
     try:
@@ -427,24 +427,25 @@ def get_orgunit(id):
             os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8"
         ) as json_file:
             data = json.load(json_file)
+            # Filter the data to find the org unit with the given ID
+            org_unit = next((item for item in data if item["id"] == id), None)
+            if not org_unit:
+                return abort(404, description=f"OrgUnit with ID {id} not found.")
+            return jsonify(org_unit)
 
-        # Filter the data to find the org unit with the given ID
-        org_unit = next((item for item in data if item["id"] == id), None)
-        if not org_unit:
-            return abort(404, description=f"OrgUnit with ID {id} not found.")
-
-        return jsonify(org_unit)
-
-    # Handle exceptions
-    # Log the error and return an error response
     except json.JSONDecodeError as json_error:
         logging.error("Error decoding JSON: %s", json_error)
         return abort(500, description="Internal server error: JSON decoding error.")
     except FileNotFoundError as fnf_error:
         logging.error("File not found: %s", fnf_error)
-        return abort(500, description="Internal server error")
+        return abort(
+            500, description="Internal server error: Organigram file not found."
+        )
+    except OSError as os_error:
+        logging.error("OS error: %s", os_error)
+        return abort(500, description="Internal server error: OS error.")
     except Exception as e:
-        logging.error("Error fetching OrgUnit data: %s", e)
+        logging.error("Unexpected error: %s", e)
         return abort(500, description="Internal server error")
 
 

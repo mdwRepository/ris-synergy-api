@@ -2,13 +2,15 @@
 """
 Module: merge_openapi_utils.py
 
-Utility functions for processing, merging, and handling OpenAPI specifications in JSON or YAML format.
+Utility functions for processing, merging, and handling OpenAPI specifications in JSON or 
+YAML format.
 
 Functions:
 - `preprocess_yaml_content`: Replaces placeholders in YAML content with specified values.
 - `merge_components`: Merges `components` sections from OpenAPI specifications.
 - `merge_paths`: Merges `paths` sections from OpenAPI specifications.
-- `load_and_merge_file`: Loads an OpenAPI specification from JSON or YAML and merges it into the specified object.
+- `load_and_merge_file`: Loads an OpenAPI specification from JSON or YAML and merges it 
+  into the specified object.
 """
 
 import json

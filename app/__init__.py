@@ -218,7 +218,7 @@ def create_app():
     except Exception as e:
         print("Error: ", e)
         sys.exit("Error: creating app")
-  
+
 
 def configure_logger(flask_app):
     """
