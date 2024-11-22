@@ -259,7 +259,7 @@ def register_blueprints(flask_app):
 
         if not enabled_blueprints:
             print("No additional blueprints enabled.")
-            return
+            return None
 
         # register the blueprints
         print("Enabled blueprints: ", enabled_blueprints)
