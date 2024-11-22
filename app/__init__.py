@@ -91,9 +91,8 @@ def check_if_env_file_exists():
     if not os.path.isfile(".env"):
         print("Info: .env file not found")
         return False
-    else:
-        print("Info: .env file found")
-        return True
+    print("Info: .env file found")
+    return True
 
 
 def check_if_required_env_variables_are_set():
@@ -151,9 +150,8 @@ def configure_keycloak_settings(app):
         app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
         logging.info("Keycloak settings configured")
         return True
-    else:
-        logging.info("Keycloak settings not configured or empty")
-        return False
+    logging.info("Keycloak settings not configured or empty")
+    return False
 
 
 # Initialize the app
