@@ -180,7 +180,7 @@ def is_valid_yaml(file_path):
     Check if a file contains valid YAML.
     """
     try:
-        with open(file_path, "r") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             yaml.safe_load(file)  # Try to parse the YAML file
         return True
     except yaml.YAMLError as e:
