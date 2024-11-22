@@ -87,8 +87,8 @@ from app.decorators import keycloak_protected
 static_url_path = os.getenv("STATIC_URL_PATH") or None
 static_folder = os.getenv("STATIC_FOLDER") or None
 
-logging.debug("static url path: ", static_url_path)
-logging.debug("static folder: ", static_folder)
+logging.debug("static url path: %s", static_url_path)
+logging.debug("static folder: %s", static_folder)
 
 # Get the supported API version from the .env file
 SUPPORTED_API_VERSION = os.getenv("SUPPORTED_API_VERSION", "1.0")
