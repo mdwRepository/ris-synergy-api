@@ -60,8 +60,8 @@ from app.decorators import (
 static_url_path = os.getenv("STATIC_URL_PATH") or None
 static_folder = os.getenv("STATIC_FOLDER") or None
 
-logging.debug("static url path: ", static_url_path)
-logging.debug("static folder: ", static_folder)
+logging.debug("static url path: %s", static_url_path)
+logging.debug("static folder: %s", static_folder)
 
 # create a blueprint
 blueprint = Blueprint(
@@ -87,6 +87,18 @@ def custom_static(filename):
 @set_theme
 @set_matomo_enabled
 def index_route():
+    """
+    Handles the index route for the application.
+
+    This function attempts to retrieve the theme, Matomo settings, and other configurations
+    from the request object and renders the index.html template with these settings. If an
+    exception occurs, it logs the error and returns a JSON response indicating an internal
+    server error.
+
+    Returns:
+        Response: A rendered HTML template with the theme and Matomo settings if successful.
+        JSON: A JSON response with an error message and a 500 status code if an exception occurs.
+    """
     try:
         # Access the theme set by the set_theme decorator and matomo_enabled and login_enabled
         theme = request.theme
