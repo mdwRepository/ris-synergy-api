@@ -121,6 +121,9 @@ if not check_if_required_env_variables_are_set():
 
 # Sentry utility function
 def is_sentry_enabled():
+    """
+    Check if Sentry is enabled by verifying the presence of the SENTRY_DSN environment variable.
+    """
     return bool(os.getenv("SENTRY_DSN"))
 
 
