@@ -78,6 +78,11 @@ from flasgger import Swagger
 from app.extensions import cors
 from .template_filters import register_template_filters
 from .error_handlers import register_error_handlers
+from .logging_setup import (
+    setup_file_handler,
+    setup_stream_handler,
+    create_log_folder,
+)
 
 # key = Fernet.generate_key()
 # cipher_suite = Fernet(key)
@@ -211,19 +216,13 @@ def create_app():
     except Exception as e:
         print("Error: ", e)
         sys.exit("Error: creating app")
-
+        
 
 def configure_logger(flask_app):
     """
     Configure loggers.
     """
     try:
-        from .logging_setup import (
-            setup_file_handler,
-            setup_stream_handler,
-            create_log_folder,
-        )
-
         # Add the handlers to the app's logger
         create_log_folder()
         flask_app.logger.addHandler(setup_file_handler())
@@ -248,7 +247,7 @@ def register_blueprints(flask_app):
     """
     try:
         # register the default blueprints required by the app
-        from app.public.views import blueprint as public_blueprint
+        from .public.views import blueprint as public_blueprint
 
         print("registering default blueprints...")
         print("public blueprint")
