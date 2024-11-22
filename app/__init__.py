@@ -135,7 +135,7 @@ if is_sentry_enabled():
     )
 
 
-def configure_keycloak_settings(app):
+def configure_keycloak_settings(flask_app):
     """
     Configure Keycloak settings if the required environment variables are set.
     """
@@ -143,10 +143,10 @@ def configure_keycloak_settings(app):
     if (
         oidc_client_id and oidc_client_id.strip()
     ):  # Check if OIDC_CLIENT_ID exists and is not empty
-        app.config["OIDC_CLIENT_ID"] = oidc_client_id
-        app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
-        app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
-        app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
+        flask_app.config["OIDC_CLIENT_ID"] = oidc_client_id
+        flask_app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
+        flask_app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
+        flask_app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
         logging.info("Keycloak settings configured")
         return True
     logging.info("Keycloak settings not configured or empty")
@@ -176,7 +176,7 @@ def create_app():
     """
     try:
         if static_url_path and static_folder:
-            app = Flask(
+            flask_app = Flask(
                 __name__, static_url_path=static_url_path, static_folder=static_folder
             )
         elif static_url_path or static_folder:
@@ -184,36 +184,36 @@ def create_app():
                 "Please supply NEITHER or BOTH of STATIC_URL_PATH and STATIC_FOLDER"
             )
         else:
-            app = Flask(__name__)
+            flask_app = Flask(__name__)
 
         print("creating app...")
-        print(app)
+        print(flask_app)
 
         # Set the secret key to some random bytes. Keep this really secret!
         # app.secret_key = secrets.token_hex(
         #     16
         # )  # Generates a 32-character hexadecimal string (16 bytes)
 
-        app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+        flask_app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
-        configure_logger(app)
-        register_error_handlers(app)
-        register_template_filters(app)
-        register_blueprints(app)
-        secure_app(app)
+        configure_logger(flask_app)
+        register_error_handlers(flask_app)
+        register_template_filters(flask_app)
+        register_blueprints(flask_app)
+        secure_application()
 
         # Configure Keycloak settings
-        app.config["KEYCLOAK_ENABLED"] = configure_keycloak_settings(app)
+        flask_app.config["KEYCLOAK_ENABLED"] = configure_keycloak_settings(flask_app)
 
         # Register Swagger (after blueprints)
-        register_swagger(app)
-        return app
+        register_swagger(flask_app)
+        return flask_app
     except Exception as e:
         print("Error: ", e)
         sys.exit("Error: creating app")
 
 
-def configure_logger(app):
+def configure_logger(flask_app):
     """
     Configure loggers.
     """
@@ -226,23 +226,23 @@ def configure_logger(app):
 
         # Add the handlers to the app's logger
         create_log_folder()
-        app.logger.addHandler(setup_file_handler())
+        flask_app.logger.addHandler(setup_file_handler())
         if setup_stream_handler() is not None:
-            app.logger.addHandler(setup_stream_handler())
+            flask_app.logger.addHandler(setup_stream_handler())
     except Exception as e:
         print("Error: ", e)
         sys.exit("Error: configuring logger")
 
 
-def register_extensions(app):
+def register_extensions(flask_app):
     """
     Register extensions with the app.
     """
-    cors.init_app(app)
+    cors.init_app(flask_app)
     return None
 
 
-def register_blueprints(app):
+def register_blueprints(flask_app):
     """
     Register blueprints with the app.
     """
@@ -252,7 +252,7 @@ def register_blueprints(app):
 
         print("registering default blueprints...")
         print("public blueprint")
-        app.register_blueprint(public_blueprint)
+        flask_app.register_blueprint(public_blueprint)
 
         # load blueprints from the environment variable ENABLED_BLUEPRINTS
         enabled_blueprints = getenv("ENABLED_BLUEPRINTS")
@@ -263,7 +263,7 @@ def register_blueprints(app):
             for blueprint_name in enabled_blueprints.split(","):
                 try:
                     blueprint = __import__(f"app.{blueprint_name}.views", fromlist=[""])
-                    app.register_blueprint(blueprint.blueprint)
+                    flask_app.register_blueprint(blueprint.blueprint)
                     print(f"Registered blueprint: {blueprint_name}")
                 except ImportError as e:
                     print(f"Failed to import or register blueprint: {e}")
@@ -272,7 +272,7 @@ def register_blueprints(app):
                     sys.exit("Error: registering blueprints")
 
             print("Available routes in the blueprints:")
-            for rule in app.url_map.iter_rules():
+            for rule in flask_app.url_map.iter_rules():
                 print(f"{rule.rule} -> {rule.endpoint}")
 
         return None
@@ -283,7 +283,7 @@ def register_blueprints(app):
         sys.exit("Error: registering blueprints")
 
 
-def register_swagger(app):
+def register_swagger(flask_app):
     """
     Register the Swagger UI and serve a custom /apispec_1.json.
     """
@@ -305,19 +305,19 @@ def register_swagger(app):
         }
 
         # Initialize Swagger with the custom config
-        swagger = Swagger(app, config=swagger_config)
+        swagger = Swagger(flask_app, config=swagger_config)
 
         if swagger:
             print("Swagger UI registered")
 
             # Debugging: Log all registered routes
             print("Registered Routes:")
-            for rule in app.url_map.iter_rules():
+            for rule in flask_app.url_map.iter_rules():
                 print(f"{rule.endpoint}: {rule.rule}")
 
             # Log registered endpoints that are documented by Swagger
             print("Endpoints documented by Swagger:")
-            for rule in app.url_map.iter_rules():
+            for rule in flask_app.url_map.iter_rules():
                 # Check if the rule is for Swagger UI
                 if "swagger" in rule.endpoint:
                     print(f"{rule.endpoint}: {rule.rule}")
@@ -329,7 +329,7 @@ def register_swagger(app):
         sys.exit("Error: registering Swagger UI")
 
 
-def secure_app(app):
+def secure_application():
     """
     Secure the app.
     """
