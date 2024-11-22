@@ -25,10 +25,15 @@ import os
 
 from functools import wraps
 from flask import request, make_response, current_app, abort, jsonify
+from flask_negotiate import produces
 
 from app import is_sentry_enabled
 from app.auth import verify_token
 from app.exceptions import TokenError
+
+# content negotiation toggler
+ENFORCE_CONTENT_NEGOTIATION = os.getenv("ENFORCE_CONTENT_NEGOTIATION", "True").lower() == "true"
+
 
 if is_sentry_enabled():
     # Import sentry_sdk only if Sentry is enabled
@@ -128,3 +133,11 @@ def keycloak_protected(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def conditional_produces(mime_type):
+    def decorator(func):
+        if ENFORCE_CONTENT_NEGOTIATION:
+            return produces(mime_type)(func)
+        return func
+    return decorator
