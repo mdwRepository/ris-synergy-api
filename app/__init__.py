@@ -1,4 +1,65 @@
 # -*- coding: utf-8 -*-
+"""
+Module: __init__.py
+
+This module initializes the Flask application for the project. It includes functions 
+and configurations to set up the app's environment, logging, extensions, blueprints, 
+Swagger UI, error handling, security features, and more.
+
+Main Features:
+- **Environment Management**:
+  - Loads environment variables using `dotenv`.
+  - Verifies the presence of required environment variables and the `.env` file.
+
+- **Logging**:
+  - Configures both file-based and console logging with rotation and custom formatting.
+
+- **Extensions and Middleware**:
+  - Registers extensions like CORS, error handlers, and template filters.
+  - Configures before and after request hooks for request timing and clickjacking protection.
+
+- **Blueprints**:
+  - Dynamically registers blueprints specified in the `ENABLED_BLUEPRINTS` environment variable.
+  - Logs registered routes and endpoints for debugging.
+
+- **Keycloak Integration**:
+  - Configures Keycloak authentication settings if the required environment variables are present.
+
+- **Swagger UI**:
+  - Integrates Swagger UI for API documentation.
+  - Configures Swagger to document all application routes.
+
+- **Security Enhancements**:
+  - Configures security headers like `X-Frame-Options` and `Content-Security-Policy` to protect against clickjacking and other attacks.
+
+Environment Variables:
+- `SECRET_KEY`: The secret key for the Flask application.
+- `LOG_LEVEL`: The logging level (e.g., DEBUG, INFO, WARNING, ERROR).
+- `LOG_FOLDER`: The folder where log files are stored.
+- `STATIC_URL_PATH`: The URL path for serving static files.
+- `STATIC_FOLDER`: The folder containing static files.
+- `SENTRY_DSN`: The DSN for Sentry integration (optional).
+- `OIDC_CLIENT_ID`, `OIDC_CREDENTIALS_SECRET`, `KEYCLOAK_TOKEN_URI`, `KEYCLOAK_INTROSPECT_URI`: Keycloak configuration settings.
+- `ENABLED_BLUEPRINTS`: Comma-separated list of blueprints to load.
+- `ALLOWED_SOURCES`: Sources allowed in the `X-Frame-Options` header for clickjacking protection.
+
+Usage:
+This module is executed when the Flask app is initialized. Use `create_app()` to 
+programmatically initialize and configure the Flask app.
+
+Example:
+    from app import create_app
+    app = create_app()
+
+Error Handling:
+Gracefully exits with descriptive messages if required configurations are missing 
+or initialization steps fail.
+
+Notes:
+- Ensure required environment variables are correctly set in the `.env` file.
+- Review the security configurations to match your deployment environment.
+"""
+
 
 import logging
 import os
@@ -8,11 +69,12 @@ import json
 
 # import secrets
 
-# from cryptography.fernet import Fernet
+from os import getenv
 from dotenv import load_dotenv
 from flask import Flask, g
 from flasgger import Swagger
-from os import getenv
+
+# from cryptography.fernet import Fernet
 
 from app.extensions import cors
 from .template_filters import register_template_filters
@@ -65,6 +127,7 @@ def is_sentry_enabled():
 # Initialize Sentry if enabled
 if is_sentry_enabled():
     import sentry_sdk
+
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
         traces_sample_rate=1.0,  # Capture 100% of transactions for performance monitoring
@@ -76,7 +139,9 @@ def configure_keycloak_settings(app):
     Configure Keycloak settings if the required environment variables are set.
     """
     oidc_client_id = os.getenv("OIDC_CLIENT_ID")
-    if oidc_client_id and oidc_client_id.strip():  # Check if OIDC_CLIENT_ID exists and is not empty
+    if (
+        oidc_client_id and oidc_client_id.strip()
+    ):  # Check if OIDC_CLIENT_ID exists and is not empty
         app.config["OIDC_CLIENT_ID"] = oidc_client_id
         app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
         app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
@@ -86,7 +151,7 @@ def configure_keycloak_settings(app):
     else:
         logging.info("Keycloak settings not configured or empty")
         return False
-    
+
 
 # Initialize the app
 

@@ -1,6 +1,62 @@
 # -*- coding: utf-8 -*-
+"""
+Module: views.py
 
-# -*- coding: utf-8 -*-
+This module defines routes for the `ris-synergy` blueprint, including endpoints for 
+serving schemas, organizational unit data, and project data. It integrates with 
+Swagger for API documentation, handles data retrieval, and ensures secure access 
+via Keycloak-protected endpoints.
+
+Blueprint:
+- `blueprint`: The `ris-synergy` blueprint for managing RIS Synergy-related endpoints.
+
+Environment Variables:
+- `STATIC_URL_PATH`: The URL path for serving static files.
+- `STATIC_FOLDER`: The folder containing static files.
+- `SUPPORTED_API_VERSION`: The API version to use for schema resolution (default: "1.0").
+- `OPEN_API_SERVER_URL`: The server URL to replace placeholders in schemas.
+- Various paths for schema and JSON files are dynamically constructed based on the API version.
+
+Key Functions:
+- **Schema Handling**:
+  - `get_ris_synergy_schema`: Serves the RIS Synergy JSON schema.
+  - `get_info_schema`: Serves the JSON schema for the "info" endpoint.
+  - `get_orgunit_schema`: Serves the JSON schema for organizational units.
+  - `get_project_schema`: Serves the JSON schema for projects.
+
+- **Data Retrieval**:
+  - `get_info`: Fetches and serves data for the "info" endpoint.
+  - `get_organigram`: Fetches and serves organizational hierarchy data.
+  - `get_organigram_by_date`: Serves organizational hierarchy data for a specific date.
+  - `get_orgunit`: Retrieves data for a specific organizational unit by ID.
+
+- **Swagger Integration**:
+  - `show_info_schema_apidocs`: Redirects to the Swagger UI for the "info" schema.
+  - `show_orgunits_schema_apidocs`: Redirects to the Swagger UI for organizational units.
+  - `show_projects_schema_apidocs`: Redirects to the Swagger UI for project schemas.
+
+Decorators:
+- `@keycloak_protected`: Secures endpoints requiring Keycloak authentication.
+- `@produces`: Ensures responses adhere to specified content types.
+- `@swag_from`: Integrates Flasgger for Swagger documentation.
+
+Utilities:
+- `is_valid_yaml`: Validates the structure of a YAML file.
+- `get_latest_json_file`: Retrieves the most recent JSON file from the `JSON_DIR`.
+- `replace_placeholder_in_file`: Replaces placeholders (e.g., `{{SERVER_URL}}`) in schema files.
+
+Error Handling:
+- Logs detailed errors for debugging.
+- Returns appropriate HTTP error codes (`400`, `404`, `500`) for invalid input, missing data, or server issues.
+
+Usage:
+This module is registered as a Flask blueprint and provides endpoints for managing 
+schemas and organizational data, along with corresponding Swagger documentation.
+
+Example Registration:
+    app.register_blueprint(blueprint)
+"""
+
 
 import logging
 import json
@@ -96,7 +152,7 @@ FUNDING_OPENAPI_SPEC_PATH = os.path.join(
     "app",
     "rissynergy",
     "openapi",
-    "funding.yaml"  # Assuming this doesn't depend on version
+    "funding.yaml",  # Assuming this doesn't depend on version
 )
 PROJECT_OPENAPI_SPEC_PATH = os.path.join(
     os.getcwd(),
@@ -157,9 +213,11 @@ def get_latest_json_file():
     except Exception as e:
         logging.error(f"Error getting latest JSON file: {e}")
         return None
-    
-    
-def replace_placeholder_in_file(file_path, placeholder="{{SERVER_URL}}", replacement=OPEN_API_SERVER_URL):
+
+
+def replace_placeholder_in_file(
+    file_path, placeholder="{{SERVER_URL}}", replacement=OPEN_API_SERVER_URL
+):
     """
     Replace a placeholder in a JSON or YAML file with the given replacement.
     """
@@ -196,7 +254,6 @@ def get_ris_synergy_schema():
     except Exception as e:
         logging.error(f"Error fetching JSON schema: {e}")
         return abort(500, description="Internal server error")
-
 
 
 @blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
@@ -250,7 +307,7 @@ def get_info():
     except Exception as e:
         logging.error(f"Error fetching info data: {e}")
         return abort(500, description="Internal server error")
-    
+
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
 @produces("application/json")
@@ -304,15 +361,22 @@ def get_organigram():
         # Replace placeholder in OpenAPI spec file
         openapi_spec = replace_placeholder_in_file(ORGUNIT_OPENAPI_SPEC_PATH)
         if openapi_spec is None:
-            logging.error(f"Failed to load or replace placeholders in OpenAPI spec file: {ORGUNIT_OPENAPI_SPEC_PATH}")
-            return abort(500, description="Internal server error: Failed to process OpenAPI spec file.")
+            logging.error(
+                f"Failed to load or replace placeholders in OpenAPI spec file: {ORGUNIT_OPENAPI_SPEC_PATH}"
+            )
+            return abort(
+                500,
+                description="Internal server error: Failed to process OpenAPI spec file.",
+            )
 
         # Log the loaded OpenAPI spec for debugging (optional)
         logging.debug(f"Processed OpenAPI Spec: {openapi_spec}")
 
     except Exception as e:
         logging.error(f"Error loading OpenAPI spec: {e}")
-        return abort(500, description="Internal server error while processing OpenAPI spec.")
+        return abort(
+            500, description="Internal server error while processing OpenAPI spec."
+        )
 
     try:
         # Fetch the latest organigram data
@@ -320,7 +384,7 @@ def get_organigram():
         logging.debug(f"Latest organigram data file: {latest_file}")
         if not latest_file:
             return abort(404, description="No organigram data available.")
-        
+
         # Load the organigram data
         with open(
             os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8"
@@ -333,7 +397,9 @@ def get_organigram():
         return abort(500, description="Internal server error: JSON decoding error.")
     except FileNotFoundError as fnf_error:
         logging.error(f"File not found: {fnf_error}")
-        return abort(500, description="Internal server error: Organigram file not found.")
+        return abort(
+            500, description="Internal server error: Organigram file not found."
+        )
     except Exception as e:
         logging.error(f"Error fetching organigram data or Swagger definition: {e}")
         return abort(500, description="Internal server error")
@@ -358,17 +424,17 @@ def get_orgunit(id):
         latest_file = get_latest_json_file()
         if not latest_file:
             return abort(404, description="No organigram data available.")
-        
+
         with open(
             os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8"
         ) as json_file:
             data = json.load(json_file)
-            
+
         # Filter the data to find the org unit with the given ID
         org_unit = next((item for item in data if item["id"] == id), None)
         if not org_unit:
             return abort(404, description=f"OrgUnit with ID {id} not found.")
-        
+
         return jsonify(org_unit)
 
     # Handle exceptions
@@ -385,7 +451,9 @@ def get_orgunit(id):
 
 
 @blueprint.route(
-    "/ris-synergy/v1/orgUnits/organigram/<date>", methods=["GET"], endpoint="organigram_by_date"
+    "/ris-synergy/v1/orgUnits/organigram/<date>",
+    methods=["GET"],
+    endpoint="organigram_by_date",
 )
 @keycloak_protected
 @produces("application/json")
@@ -395,11 +463,11 @@ def get_organigram_by_date(date):
     This endpoint serves the organizational tree of the university for a specific date.
     """
     try:
-        # Validate the date format (YYYY-MM-DD) 
+        # Validate the date format (YYYY-MM-DD)
         # Ensure the date parameter only contains valid characters
-        if not re.match(r'^\d{4}-\d{2}-\d{2}$', date):
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
             return abort(400, description="Invalid date format. Use YYYY-MM-DD.")
-               
+
         # Resolve the JSON directory path
         BASE_DIR = Path(JSON_DIR).resolve()
 
@@ -408,7 +476,7 @@ def get_organigram_by_date(date):
 
         # Construct the file path
         file_path = os.path.normpath(BASE_DIR / safe_date).resolve()
-        
+
         # Check if the resolved path is still within BASE_DIR
         if not str(file_path).startswith(str(BASE_DIR)):
             return abort(400, description="Invalid date input.")

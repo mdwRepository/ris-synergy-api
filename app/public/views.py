@@ -1,4 +1,43 @@
 # -*- coding: utf-8 -*-
+"""
+Module: views.py
+
+This module defines the public-facing routes and views for the Flask application. 
+It uses a Flask blueprint to modularize the application and provides endpoints 
+for serving static files, rendering the main page, and a health check.
+
+Blueprint:
+- `blueprint`: The public blueprint for static file serving and index page rendering.
+
+Routes:
+- `/static/<path:filename>`: Serves static files from the configured static folder 
+  with custom security headers.
+- `/`: Renders the main index page with theme and Matomo analytics configuration, 
+  as set by decorators.
+- `/ping`: A health check endpoint for monitoring the application's status.
+
+Decorators:
+- `@set_theme`: Adds theme information to the request context.
+- `@set_matomo_enabled`: Adds Matomo analytics configuration to the request context.
+
+Environment Variables:
+- `STATIC_URL_PATH`: The URL path used for serving static files.
+- `STATIC_FOLDER`: The folder where static files are stored.
+
+Error Handling:
+- All routes include basic error handling that logs exceptions and returns a JSON 
+  response with an error message and a 500 status code in case of failure.
+
+Dependencies:
+- Flask modules for routing, templates, and responses.
+- Custom decorators from `app.decorators` for setting request-specific context.
+
+Usage:
+This module is registered as a blueprint in the application setup process. To 
+register the blueprint:
+    app.register_blueprint(blueprint)
+"""
+
 
 import logging
 import os
