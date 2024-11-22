@@ -60,7 +60,7 @@ Example:
 import requests
 
 from jsonschema import validate
-from jsonschema.exceptions import ValidationError
+from jsonschema.exceptions import ValidationError, SchemaError
 
 
 def download_json_data(url, params=None):
@@ -97,6 +97,9 @@ def validate_json_against_json_schema(json_data, json_schema):
         return True
     except ValidationError as e:
         print(f"Validation Error: {e}")
+        return False, str(e)
+    except SchemaError as e:
+        print(f"Schema Error: {e}")
         return False, str(e)
     except TypeError as e:
         print(f"Type Error: {e}")
