@@ -58,11 +58,13 @@ def register_template_filters(app):
             return ""
         # Parse the ISO format string to datetime object
         try:
-            # If your dates are always in UTC, ensure to convert them properly to the desired timezone here
+            # If your dates are always in UTC, ensure to convert them properly
+            # to the desired timezone here
             dt = datetime.datetime.fromisoformat(value.rstrip("Z")).replace(
                 tzinfo=pytz.utc
             )
-            # Convert to local time or another timezone if needed, e.g., dt.astimezone(pytz.timezone('Europe/Vienna'))
+            # Convert to local time or another timezone if needed, e.g.,
+            # dt.astimezone(pytz.timezone('Europe/Vienna'))
         except ValueError:
             return value  # Return the original value if parsing fails
         return dt.strftime(date_format)

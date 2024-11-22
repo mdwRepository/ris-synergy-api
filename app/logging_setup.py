@@ -70,7 +70,7 @@ def set_log_level():
         "DEBUG": logging.DEBUG,
         "INFO": logging.INFO,
         "WARNING": logging.WARNING,
-        "ERROR": logging.ERROR
+        "ERROR": logging.ERROR,
     }
     log_level = log_levels.get(log_level_env, logging.INFO)
     return log_level
