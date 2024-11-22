@@ -30,7 +30,8 @@ Main Features:
   - Configures Swagger to document all application routes.
 
 - **Security Enhancements**:
-  - Configures security headers like `X-Frame-Options` and `Content-Security-Policy` to protect against clickjacking and other attacks.
+  - Configures security headers like `X-Frame-Options` and `Content-Security-Policy` 
+    to protect against clickjacking and other attacks.
 
 Environment Variables:
 - `SECRET_KEY`: The secret key for the Flask application.
@@ -39,7 +40,8 @@ Environment Variables:
 - `STATIC_URL_PATH`: The URL path for serving static files.
 - `STATIC_FOLDER`: The folder containing static files.
 - `SENTRY_DSN`: The DSN for Sentry integration (optional).
-- `OIDC_CLIENT_ID`, `OIDC_CREDENTIALS_SECRET`, `KEYCLOAK_TOKEN_URI`, `KEYCLOAK_INTROSPECT_URI`: Keycloak configuration settings.
+- `OIDC_CLIENT_ID`, `OIDC_CREDENTIALS_SECRET`, `KEYCLOAK_TOKEN_URI`, `KEYCLOAK_INTROSPECT_URI`: 
+   Keycloak configuration settings.
 - `ENABLED_BLUEPRINTS`: Comma-separated list of blueprints to load.
 - `ALLOWED_SOURCES`: Sources allowed in the `X-Frame-Options` header for clickjacking protection.
 
@@ -216,7 +218,7 @@ def create_app():
     except Exception as e:
         print("Error: ", e)
         sys.exit("Error: creating app")
-        
+  
 
 def configure_logger(flask_app):
     """
