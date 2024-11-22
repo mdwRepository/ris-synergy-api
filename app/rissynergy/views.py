@@ -47,7 +47,8 @@ Utilities:
 
 Error Handling:
 - Logs detailed errors for debugging.
-- Returns appropriate HTTP error codes (`400`, `404`, `500`) for invalid input, missing data, or server issues.
+- Returns appropriate HTTP error codes (`400`, `404`, `500`) for invalid input, missing data, or 
+  server issues.
 
 Usage:
 This module is registered as a Flask blueprint and provides endpoints for managing 
@@ -64,21 +65,20 @@ import os
 import re
 import yaml
 
+from datetime import datetime
+from pathlib import Path
+
 from flask import (
     Blueprint,
     redirect,
     render_template,
-    request,
     jsonify,
     abort,
     url_for,
     current_app,
 )
-
 from flask_negotiate import produces
-from datetime import datetime
 from flasgger import swag_from
-from pathlib import Path
 from werkzeug.utils import secure_filename
 
 from app.decorators import keycloak_protected
