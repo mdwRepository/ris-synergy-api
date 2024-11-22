@@ -107,7 +107,7 @@ def check_if_required_env_variables_are_set():
     print(f"Info: required environment variables: {required_env_variables}")
     for env_variable in required_env_variables:
         if not os.getenv(env_variable):
-            logging.error(f"Error: {env_variable} not set")
+            logging.error("Error: %s not set", env_variable)
             return False
     return True
 
