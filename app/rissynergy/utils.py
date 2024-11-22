@@ -94,6 +94,7 @@ def validate_json_against_json_schema(json_data, json_schema):
         # validate json_data against json_schema
         print("Validating JSON data against JSON schema")
         validate(instance=json_data, schema=json_schema)
+        return True
     except ValidationError as e:
         print(f"Validation Error: {e}")
         return False, str(e)
