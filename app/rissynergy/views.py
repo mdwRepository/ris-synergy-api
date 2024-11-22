@@ -25,7 +25,7 @@ from flasgger import swag_from
 from pathlib import Path
 from werkzeug.utils import secure_filename
 
-from app.decorators import keycloak_protected
+from app.decorators import keycloak_protected, conditional_produces
 
 
 static_url_path = os.getenv("STATIC_URL_PATH") or None
@@ -182,7 +182,7 @@ def replace_placeholder_in_file(file_path, placeholder="{{SERVER_URL}}", replace
 
 
 @blueprint.route("/ris-synergy/ris_synergy.json", methods=["GET"])
-@produces("application/json")
+@conditional_produces("application/json")
 def get_ris_synergy_schema():
     """
     Get RIS Synergy JSON Schema
@@ -200,6 +200,7 @@ def get_ris_synergy_schema():
 
 
 @blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
+@conditional_produces("application/json")
 def get_info_schema():
     """
     Get Info JSON Schema
@@ -237,7 +238,7 @@ def show_info_schema_apidocs():
     endpoint="ris-synergy.info",
     methods=["GET"],
 )
-@produces("application/json")
+@conditional_produces("application/json")
 def get_info():
     """
     This endpoint serves the info data.
@@ -253,7 +254,7 @@ def get_info():
     
 
 @blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
-@produces("application/json")
+@conditional_produces("application/json")
 def get_orgunit_schema():
     """
     Get OrgUnit JSON Schema
@@ -294,7 +295,7 @@ def show_orgunits_schema_apidocs():
     methods=["GET"],
 )
 @keycloak_protected
-@produces("application/json")
+@conditional_produces("application/json")
 def get_organigram():
     """
     Get Organigram Data
@@ -348,7 +349,7 @@ def get_organigram():
     methods=["GET"],
 )
 @keycloak_protected
-@produces("application/json")
+@conditional_produces("application/json")
 def get_orgunit(id):
     """Get specific OrgUnit by ID
     This endpoint serves the data for a specific organizational unit based on its ID.
@@ -388,7 +389,7 @@ def get_orgunit(id):
     "/ris-synergy/v1/orgUnits/organigram/<date>", methods=["GET"], endpoint="organigram_by_date"
 )
 @keycloak_protected
-@produces("application/json")
+@conditional_produces("application/json")
 def get_organigram_by_date(date):
     """
     Get Organigram Data for a Specific Date
@@ -433,7 +434,7 @@ def get_organigram_by_date(date):
 
 
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
-@produces("application/json")
+@conditional_produces("application/json")
 def get_project_schema():
     """
     Get Project JSON Schema
