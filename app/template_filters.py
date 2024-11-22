@@ -50,7 +50,7 @@ def register_template_filters(app):
     """
 
     @app.template_filter("isoformat_to_human")
-    def isoformat_to_human(value, format="%B %d, %Y %H:%M"):
+    def isoformat_to_human(value, date_format="%B %d, %Y %H:%M"):
         """
         Convert ISO format string to a more readable format for use in templates.
         """
@@ -65,4 +65,4 @@ def register_template_filters(app):
             # Convert to local time or another timezone if needed, e.g., dt.astimezone(pytz.timezone('Europe/Vienna'))
         except ValueError:
             return value  # Return the original value if parsing fails
-        return dt.strftime(format)
+        return dt.strftime(date_format)
