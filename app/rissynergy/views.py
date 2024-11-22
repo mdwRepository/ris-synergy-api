@@ -223,7 +223,7 @@ def replace_placeholder_in_file(
         content = content.replace(placeholder, replacement)
         if file_path.endswith(".json"):
             return json.loads(content)
-        elif file_path.endswith(".yaml") or file_path.endswith(".yml"):
+        if file_path.endswith(".yaml") or file_path.endswith(".yml"):
             return yaml.safe_load(content)
         raise ValueError("Unsupported file type")
     except FileNotFoundError:
