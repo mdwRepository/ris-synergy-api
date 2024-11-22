@@ -70,7 +70,7 @@ def download_json_data(url, params={}):
         headers = {
             "Accept": "application/json",
         }
-        response = requests.get(url, headers=headers, params=params)
+        response = requests.get(url, headers=headers, params=params, timeout=10)
         print(f"Response: {response.status_code}")
         print(f"Response: {response.text}")
         if response.status_code == 200:
