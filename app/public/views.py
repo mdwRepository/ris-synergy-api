@@ -79,12 +79,12 @@ def custom_static(filename):
         response.headers["X-Content-Type-Options"] = "nosniff"
         return response
     except FileNotFoundError as e:
-        logging.error(e)
+        logging.error("File not found: %s - %s", filename, e)
+        # Explicitly return a JSON response
         return jsonify({"error": "File not found"}), 404
     except PermissionError as e:
-        logging.error(e)
+        logging.error("Permission denied: %s - %s", filename, e)
         return jsonify({"error": "Permission denied"}), 403
-
 
 
 @blueprint.route("/", methods=["GET", "POST"])
