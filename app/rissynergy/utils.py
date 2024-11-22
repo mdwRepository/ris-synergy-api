@@ -81,8 +81,8 @@ def download_json_data(url, params=None):
         # print response.status_code and error message
         print(f"Error: {response.status_code} {response.text}")
         return None
-    except Exception as e:
-        print(f"Error: {e}")
+    except requests.exceptions.RequestException as e:
+        print(f"Request Error: {e}")
         return None
 
 
@@ -98,6 +98,9 @@ def validate_json_against_json_schema(json_data, json_schema):
     except ValidationError as e:
         print(f"Validation Error: {e}")
         return False, str(e)
-    except Exception as e:
-        print(f"Error: {e}")
-        return False
+    except TypeError as e:
+        print(f"Type Error: {e}")
+        return False, str(e)
+    except ValueError as e:
+        print(f"Value Error: {e}")
+        return False, str(e)

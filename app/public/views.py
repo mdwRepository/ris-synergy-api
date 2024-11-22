@@ -78,9 +78,13 @@ def custom_static(filename):
         response = send_from_directory(static_folder, filename)
         response.headers["X-Content-Type-Options"] = "nosniff"
         return response
-    except Exception as e:
+    except FileNotFoundError as e:
         logging.error(e)
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": "File not found"}), 404
+    except PermissionError as e:
+        logging.error(e)
+        return jsonify({"error": "Permission denied"}), 403
+
 
 
 @blueprint.route("/", methods=["GET", "POST"])
@@ -112,9 +116,12 @@ def index_route():
             matomo_url=matomo_url,
             matomo_site_id=matomo_site_id,
         )
-    except Exception as e:
-        logging.error(e)
-        return jsonify({"error": "Internal server error"}), 500
+    except KeyError as e:
+        logging.error("Key error: %s", e)
+        return jsonify({"error": "Key error"}), 400
+    except ValueError as e:
+        logging.error("Value error: %s", e)
+        return jsonify({"error": "Value error"}), 400
 
 
 @blueprint.route("/ping", methods=["HEAD", "GET"])

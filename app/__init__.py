@@ -78,6 +78,7 @@ from flasgger import Swagger
 # from cryptography.fernet import Fernet
 
 from app.extensions import cors
+from app.public.views import blueprint as public_blueprint
 from .template_filters import register_template_filters
 from .error_handlers import register_error_handlers
 from .logging_setup import (
@@ -85,6 +86,7 @@ from .logging_setup import (
     setup_stream_handler,
     create_log_folder,
 )
+from .utils import is_sentry_enabled
 
 # key = Fernet.generate_key()
 # cipher_suite = Fernet(key)
@@ -124,14 +126,6 @@ if not check_if_required_env_variables_are_set():
     sys.exit("Error: required environment variables not set")
 
 
-# Sentry utility function
-def is_sentry_enabled():
-    """
-    Check if Sentry is enabled by verifying the presence of the SENTRY_DSN environment variable.
-    """
-    return bool(os.getenv("SENTRY_DSN"))
-
-
 # Initialize Sentry if enabled
 if is_sentry_enabled():
     import sentry_sdk
@@ -151,9 +145,13 @@ def configure_keycloak_settings(flask_app):
         oidc_client_id and oidc_client_id.strip()
     ):  # Check if OIDC_CLIENT_ID exists and is not empty
         flask_app.config["OIDC_CLIENT_ID"] = oidc_client_id
-        flask_app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv("OIDC_CREDENTIALS_SECRET")
+        flask_app.config["OIDC_CREDENTIALS_SECRET"] = os.getenv(
+            "OIDC_CREDENTIALS_SECRET"
+        )
         flask_app.config["KEYCLOAK_TOKEN_URI"] = os.getenv("KEYCLOAK_TOKEN_URI")
-        flask_app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv("KEYCLOAK_INTROSPECT_URI")
+        flask_app.config["KEYCLOAK_INTROSPECT_URI"] = os.getenv(
+            "KEYCLOAK_INTROSPECT_URI"
+        )
         logging.info("Keycloak settings configured")
         return True
     logging.info("Keycloak settings not configured or empty")
@@ -172,9 +170,9 @@ try:
     print("static folder: ", static_folder)
 
 except ValueError as e:
-    print("Error: ", e)
-except Exception as e:
-    print("Error: ", e)
+    print("Value Error: ", e)
+except OSError as e:
+    print("OS Error: ", e)
 
 
 def create_app():
@@ -215,7 +213,7 @@ def create_app():
         # Register Swagger (after blueprints)
         register_swagger(flask_app)
         return flask_app
-    except Exception as e:
+    except (OSError, ValueError) as e:
         print("Error: ", e)
         sys.exit("Error: creating app")
 
@@ -230,8 +228,11 @@ def configure_logger(flask_app):
         flask_app.logger.addHandler(setup_file_handler())
         if setup_stream_handler() is not None:
             flask_app.logger.addHandler(setup_stream_handler())
-    except Exception as e:
-        print("Error: ", e)
+    except OSError as e:
+        print("OS Error: ", e)
+        sys.exit("Error: configuring logger")
+    except ValueError as e:
+        print("Value Error: ", e)
         sys.exit("Error: configuring logger")
 
 
@@ -242,48 +243,42 @@ def register_extensions(flask_app):
     cors.init_app(flask_app)
 
 
-def register_blueprints(flask_app):
+def register_blueprints(flask_app) -> None:
     """
     Register blueprints with the app.
     """
-    try:
-        # register the default blueprints required by the app
-        from .public.views import blueprint as public_blueprint
+    print("registering default blueprints...")
+    print("public blueprint")
+    flask_app.register_blueprint(public_blueprint)
 
-        print("registering default blueprints...")
-        print("public blueprint")
-        flask_app.register_blueprint(public_blueprint)
+    # load blueprints from the environment variable ENABLED_BLUEPRINTS
+    enabled_blueprints = getenv("ENABLED_BLUEPRINTS")
 
-        # load blueprints from the environment variable ENABLED_BLUEPRINTS
-        enabled_blueprints = getenv("ENABLED_BLUEPRINTS")
-
-        if not enabled_blueprints:
-            print("No additional blueprints enabled.")
-            return None
-
-        # register the blueprints
-        print("Enabled blueprints: ", enabled_blueprints)
-        for blueprint_name in enabled_blueprints.split(","):
-            try:
-                blueprint = __import__(f"app.{blueprint_name}.views", fromlist=[""])
-                flask_app.register_blueprint(blueprint.blueprint)
-                print(f"Registered blueprint: {blueprint_name}")
-            except ImportError as e:
-                print(f"Failed to import or register blueprint: {e}")
-            except Exception as e:
-                print("Error: ", e)
-                sys.exit("Error: registering blueprints")
-
-        print("Available routes in the blueprints:")
-        for rule in flask_app.url_map.iter_rules():
-            print(f"{rule.rule} -> {rule.endpoint}")
-
+    if not enabled_blueprints:
+        print("No additional blueprints enabled.")
         return None
-    except ImportError as e:
-        print(f"Failed to import or register blueprint: {e}")
-    except Exception as e:
-        print("Error: ", e)
-        sys.exit("Error: registering blueprints")
+
+    # register the blueprints
+    print("Enabled blueprints: ", enabled_blueprints)
+    for blueprint_name in enabled_blueprints.split(","):
+        try:
+            blueprint = __import__(f"app.{blueprint_name}.views", fromlist=[""])
+            flask_app.register_blueprint(blueprint.blueprint)
+            print(f"Registered blueprint: {blueprint_name}")
+        except ImportError as e:
+            print(f"Failed to import or register blueprint: {e}")
+        except AttributeError as e:
+            print(f"AttributeError: {e}")
+            sys.exit("Error: registering blueprints")
+        except TypeError as e:
+            print(f"TypeError: {e}")
+            sys.exit("Error: registering blueprints")
+
+    print("Available routes in the blueprints:")
+    for rule in flask_app.url_map.iter_rules():
+        print(f"{rule.rule} -> {rule.endpoint}")
+
+    return None
 
 
 def register_swagger(flask_app):
@@ -301,8 +296,8 @@ def register_swagger(flask_app):
                     "endpoint": "apispec",
                     # Use the blueprint's route for the OpenAPI spec
                     "route": "/ris-synergy/ris_synergy.json",
-                    "rule_filter": lambda rule: True,  # include all routes
-                    "model_filter": lambda tag: True,  # include all models
+                    "rule_filter": lambda _: True,  # include all routes
+                    "model_filter": lambda _: True,  # include all models
                 }
             ],
         }
@@ -327,7 +322,7 @@ def register_swagger(flask_app):
 
         return None
 
-    except Exception as e:
+    except (ImportError, AttributeError, TypeError) as e:
         print(f"Error: {e}")
         sys.exit("Error: registering Swagger UI")
 

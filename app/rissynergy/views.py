@@ -64,7 +64,6 @@ import json
 import os
 import re
 from pathlib import Path
-from datetime import datetime
 import yaml
 
 from flask import (
@@ -185,9 +184,6 @@ def is_valid_yaml(file_path):
     except FileNotFoundError as e:
         logging.error("Error reading %s: %s", file_path, e)
         return False
-    except Exception as e:
-        logging.error("An error occurred: %s", e)
-        return False
 
 
 def get_latest_json_file():
@@ -195,19 +191,23 @@ def get_latest_json_file():
     Get the latest JSON file in the JSON_DIR directory.
     """
     try:
-        # Get all JSON files with the naming pattern organigram_YYYY-MM-DD.json
         files = [
             f
             for f in os.listdir(JSON_DIR)
             if f.startswith("organigram_") and f.endswith(".json")
         ]
-        # Sort files by date based on the filename
         files.sort(reverse=True)
         if not files:
             raise FileNotFoundError("No JSON files found.")
         return files[0]
-    except Exception as e:
-        logging.error("Error getting latest JSON file: %s", e)
+    except FileNotFoundError as e:
+        logging.error("No JSON files found or directory missing: %s", e)
+        return None
+    except PermissionError as e:
+        logging.error("Permission error accessing JSON_DIR: %s", e)
+        return None
+    except OSError as e:  # For other OS-related issues
+        logging.error("OS error while accessing JSON_DIR: %s", e)
         return None
 
 
@@ -226,10 +226,7 @@ def replace_placeholder_in_file(
         if file_path.endswith(".yaml") or file_path.endswith(".yml"):
             return yaml.safe_load(content)
         raise ValueError("Unsupported file type")
-    except FileNotFoundError:
-        logging.error("File not found: %s", file_path)
-        return None
-    except Exception as e:
+    except (FileNotFoundError, json.JSONDecodeError, yaml.YAMLError, ValueError, OSError) as e:
         logging.error("Error processing file %s: %s", file_path, e)
         return None
 
@@ -246,7 +243,7 @@ def get_ris_synergy_schema():
         if schema is None:
             return abort(500, description="Internal server error")
         return jsonify(schema)
-    except Exception as e:
+    except (FileNotFoundError, ValueError, json.JSONDecodeError) as e:
         logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
@@ -263,7 +260,7 @@ def get_info_schema():
         if schema is None:
             return abort(500, description="Internal server error")
         return jsonify(schema)
-    except Exception as e:
+    except (FileNotFoundError, ValueError, json.JSONDecodeError, yaml.YAMLError) as e:
         logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
@@ -274,14 +271,10 @@ def show_info_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for info schema.
     """
-    try:
-        # Use url_for to dynamically build the path to the schema endpoint
-        schema_url = url_for("ris-synergy.get_info_schema", _external=True)
-        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-        return redirect(f"/apidocs?url={schema_url}")
-    except Exception as e:
-        logging.error("Error redirecting to Swagger UI: %s", e)
-        return abort(500, description="Internal server error")
+    # Use url_for to dynamically build the path to the schema endpoint
+    schema_url = url_for("ris-synergy.get_info_schema", _external=True)
+    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+    return redirect(f"/apidocs?url={schema_url}")
 
 
 @blueprint.route("/ris-synergy/v1/info", methods=["GET"], endpoint="info")
@@ -300,7 +293,7 @@ def get_info():
         if data is None:
             return abort(500, description="Internal server error")
         return jsonify(data)
-    except Exception as e:
+    except (FileNotFoundError, ValueError, json.JSONDecodeError, yaml.YAMLError) as e:
         logging.error("Error fetching info data: %s", e)
         return abort(500, description="Internal server error")
 
@@ -317,7 +310,7 @@ def get_orgunit_schema():
         if schema is None:
             return abort(500, description="Internal server error")
         return jsonify(schema)
-    except Exception as e:
+    except (FileNotFoundError, ValueError, json.JSONDecodeError, yaml.YAMLError) as e:
         logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
@@ -328,14 +321,10 @@ def show_orgunits_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for orgunit schema.
     """
-    try:
-        # Use url_for to dynamically build the path to the schema endpoint
-        schema_url = url_for("ris-synergy.get_orgunit_schema", _external=True)
-        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-        return redirect(f"/apidocs?url={schema_url}")
-    except Exception as e:
-        logging.error("Error redirecting to Swagger UI: %s", e)
-        return abort(500, description="Internal server error")
+    # Use url_for to dynamically build the path to the schema endpoint
+    schema_url = url_for("ris-synergy.get_orgunit_schema", _external=True)
+    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+    return redirect(f"/apidocs?url={schema_url}")
 
 
 @blueprint.route(
@@ -358,29 +347,19 @@ def get_organigram():
         openapi_spec = replace_placeholder_in_file(ORGUNIT_OPENAPI_SPEC_PATH)
         if openapi_spec is None:
             logging.error(
-                "Failed to load or replace placeholders in OpenAPI spec file: %s", 
-                ORGUNIT_OPENAPI_SPEC_PATH
+                "Failed to load or replace placeholders in OpenAPI spec file: %s",
+                ORGUNIT_OPENAPI_SPEC_PATH,
             )
-            return abort(
-                500,
-                description="Internal server error: Failed to process OpenAPI spec file.",
-            )
+            raise ValueError("Failed to process OpenAPI spec file.")
 
         # Log the loaded OpenAPI spec for debugging (optional)
         logging.debug("Processed OpenAPI Spec: %s", openapi_spec)
 
-    except Exception as e:
-        logging.error("Error loading OpenAPI spec: %s", e)
-        return abort(
-            500, description="Internal server error while processing OpenAPI spec."
-        )
-
-    try:
         # Fetch the latest organigram data
         latest_file = get_latest_json_file()
         logging.debug("Latest organigram data file: %s", latest_file)
         if not latest_file:
-            return abort(404, description="No organigram data available.")
+            raise FileNotFoundError("No organigram data available.")
 
         # Load the organigram data
         with open(
@@ -389,21 +368,16 @@ def get_organigram():
             data = json.load(json_file)
             return jsonify(data)
 
-    except json.JSONDecodeError as json_error:
-        logging.error("Error decoding JSON: %s", json_error)
-        return abort(500, description="Internal server error: JSON decoding error.")
-    except FileNotFoundError as fnf_error:
-        logging.error("File not found: %s", fnf_error)
-        return abort(
-            500, description="Internal server error: Organigram file not found."
-        )
-    except Exception as e:
-        logging.error("Error fetching organigram data or Swagger definition: %s", e)
-        return abort(500, description="Internal server error")
+    except (json.JSONDecodeError, FileNotFoundError, ValueError) as e:
+        logging.error("Specific error: %s", e)
+        return abort(500, description=f"Internal server error: {e}")
+    except OSError as e:
+        logging.error("OS error: %s", e)
+        return abort(500, description=f"Internal server error: {e}")
 
 
 @blueprint.route(
-    "/ris-synergy/v1/orgUnits/<id>", methods=["GET"], endpoint="get_orgunit"
+    "/ris-synergy/v1/orgUnits/<orgunit_id>", methods=["GET"], endpoint="get_orgunit"
 )
 @swag_from(
     ORGUNIT_OPENAPI_SPEC_PATH,
@@ -412,7 +386,7 @@ def get_organigram():
 )
 @keycloak_protected
 @conditional_produces("application/json")
-def get_orgunit(id):
+def get_orgunit(orgunit_id):
     """
     Get specific OrgUnit by ID
     This endpoint serves the data for a specific organizational unit based on its ID.
@@ -421,32 +395,24 @@ def get_orgunit(id):
         # Fetch the latest organigram data
         latest_file = get_latest_json_file()
         if not latest_file:
-            return abort(404, description="No organigram data available.")
+            raise FileNotFoundError("No organigram data available.")
 
         with open(
             os.path.join(JSON_DIR, latest_file), "r", encoding="utf-8"
         ) as json_file:
             data = json.load(json_file)
             # Filter the data to find the org unit with the given ID
-            org_unit = next((item for item in data if item["id"] == id), None)
+            org_unit = next((item for item in data if item["id"] == orgunit_id), None)
             if not org_unit:
-                return abort(404, description=f"OrgUnit with ID {id} not found.")
+                raise ValueError(f"OrgUnit with ID {orgunit_id} not found.")
             return jsonify(org_unit)
 
-    except json.JSONDecodeError as json_error:
-        logging.error("Error decoding JSON: %s", json_error)
-        return abort(500, description="Internal server error: JSON decoding error.")
-    except FileNotFoundError as fnf_error:
-        logging.error("File not found: %s", fnf_error)
-        return abort(
-            500, description="Internal server error: Organigram file not found."
-        )
-    except OSError as os_error:
-        logging.error("OS error: %s", os_error)
-        return abort(500, description="Internal server error: OS error.")
-    except Exception as e:
-        logging.error("Unexpected error: %s", e)
-        return abort(500, description="Internal server error")
+    except (json.JSONDecodeError, FileNotFoundError, ValueError) as e:
+        logging.error("Specific error: %s", e)
+        return abort(500, description=f"Internal server error: {e}")
+    except OSError as e:
+        logging.error("OS error: %s", e)
+        return abort(500, description=f"Internal server error: {e}")
 
 
 @blueprint.route(
@@ -465,7 +431,7 @@ def get_organigram_by_date(date):
         # Validate the date format (YYYY-MM-DD)
         # Ensure the date parameter only contains valid characters
         if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
-            return abort(400, description="Invalid date format. Use YYYY-MM-DD.")
+            raise ValueError("Invalid date format. Use YYYY-MM-DD.")
 
         # Resolve the JSON directory path
         base_dir = Path(JSON_DIR).resolve()
@@ -478,25 +444,20 @@ def get_organigram_by_date(date):
 
         # Check if the resolved path is still within base_dir
         if not str(file_path).startswith(str(base_dir)):
-            return abort(400, description="Invalid date input.")
+            raise ValueError("Invalid date input.")
 
         # Ensure the file exists and is accessible
         if not file_path.is_file():
-            return abort(404, description=f"No organigram data available for {date}.")
+            raise FileNotFoundError(f"No organigram data available for {date}.")
 
         # Read and return the content of the file
         with file_path.open("r", encoding="utf-8") as json_file:
             data = json.load(json_file)
             return jsonify(data)
 
-    # Handle exceptions
-    # Log the error and return an error response
-    except json.JSONDecodeError as json_error:
-        logging.error("Error decoding JSON: %s", json_error)
-        return abort(500, description="Internal server error: JSON decoding error.")
-    except Exception as e:
-        logging.error("Error fetching organigram data for date %s: %s", date, e)
-        return abort(500, description="Internal server error")
+    except (json.JSONDecodeError, FileNotFoundError, ValueError, OSError) as e:
+        logging.error("Error processing request: %s", e)
+        return abort(500, description=f"Internal server error: {e}")
 
 
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
@@ -511,7 +472,7 @@ def get_project_schema():
         if schema is None:
             return abort(500, description="Internal server error")
         return jsonify(schema)
-    except Exception as e:
+    except (FileNotFoundError, ValueError, json.JSONDecodeError, yaml.YAMLError) as e:
         logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
@@ -522,11 +483,8 @@ def show_projects_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for project schema.
     """
-    try:
-        # Use url_for to dynamically build the path to the schema endpoint
-        schema_url = url_for("ris-synergy.get_project_schema", _external=True)
-        # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
-        return redirect(f"/apidocs?url={schema_url}")
-    except Exception as e:
-        logging.error("Error redirecting to Swagger UI: %s", e)
-        return abort(500, description="Internal server error")
+    # Use url_for to dynamically build the path to the schema endpoint
+    schema_url = url_for("ris-synergy.get_project_schema", _external=True)
+    # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
+    return redirect(f"/apidocs?url={schema_url}")
+    

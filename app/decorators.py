@@ -27,7 +27,7 @@ from functools import wraps
 from flask import request, make_response, current_app, abort, jsonify
 from flask_negotiate import produces
 
-from app import is_sentry_enabled
+from app.utils import is_sentry_enabled
 from app.auth import verify_token
 from app.exceptions import TokenError
 
