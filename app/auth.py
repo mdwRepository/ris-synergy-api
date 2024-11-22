@@ -42,14 +42,17 @@ def verify_token(token):
     client_id = current_app.config["OIDC_CLIENT_ID"]
     client_secret = current_app.config["OIDC_CREDENTIALS_SECRET"]
 
-    # Prepare the introspection request to Keycloak
-    response = requests.post(
-        introspect_url,
-        data={"token": token},
-        auth=(client_id, client_secret),
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        timeout=5,
-    )
+    try:
+        # Prepare the introspection request to Keycloak
+        response = requests.post(
+            introspect_url,
+            data={"token": token},
+            auth=(client_id, client_secret),
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            timeout=5,
+        )
+    except requests.RequestException:
+        abort(500, description="Error connecting to authentication server")
 
     # Check if the request was successful otherwise raise an error
     if response.status_code != 200:
