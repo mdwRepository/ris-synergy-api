@@ -78,10 +78,9 @@ def download_json_data(url, params=None):
         print(f"Response: {response.text}")
         if response.status_code == 200:
             return response.json()
-        else:
-            # print response.status_code and error message
-            print(f"Error: {response.status_code} {response.text}")
-            return None
+        # print response.status_code and error message
+        print(f"Error: {response.status_code} {response.text}")
+        return None
     except Exception as e:
         print(f"Error: {e}")
         return None
@@ -97,7 +96,7 @@ def validate_json_against_json_schema(json_data, json_schema):
         validate(instance=json_data, schema=json_schema)
     except ValidationError as e:
         print(f"Validation Error: {e}")
-        return False
+        return False, str(e)
     except Exception as e:
         print(f"Error: {e}")
         return False
