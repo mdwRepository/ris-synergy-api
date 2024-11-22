@@ -71,11 +71,9 @@ from pathlib import Path
 from flask import (
     Blueprint,
     redirect,
-    render_template,
     jsonify,
     abort,
     url_for,
-    current_app,
 )
 from flask_negotiate import produces
 from flasgger import swag_from
