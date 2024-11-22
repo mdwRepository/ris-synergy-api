@@ -1,4 +1,37 @@
 # -*- coding: utf-8 -*-
+"""
+Module: error_handlers.py
+
+This module defines and registers custom error handlers for the Flask application.
+These error handlers ensure consistent JSON-formatted error responses across the
+application for common HTTP error codes.
+
+Functions:
+- `register_error_handlers(app)`: Registers error handlers for various HTTP
+  status codes with the provided Flask application instance.
+
+Error Handlers:
+- `500`: Internal Server Error
+- `403`: Forbidden
+- `404`: Page Not Found
+- `405`: Method Not Allowed
+- `400`: Bad Request
+- `401`: Unauthorized
+- `429`: Too Many Requests
+- `503`: Service Unavailable
+
+Usage:
+Call `register_error_handlers(app)` during the Flask application setup process
+to enable these handlers.
+
+Dependencies:
+- `flask`: Used for defining error handlers and generating JSON responses.
+
+Each error handler returns a JSON response with a standardized format:
+{
+    "error": "<Error Code and Description>"
+}
+"""
 
 from flask import jsonify
 

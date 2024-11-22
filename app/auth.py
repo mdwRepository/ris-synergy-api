@@ -1,4 +1,32 @@
 # -*- coding: utf-8 -*-
+"""
+Module: auth.py
+
+This module handles authentication logic for the Flask application. It provides
+a function to verify access tokens using Keycloak's introspection endpoint.
+
+Functions:
+- `verify_token(token)`: Verifies the validity of an access token by
+  communicating with Keycloak's introspection endpoint. If the token is invalid
+  or expired, an appropriate HTTP error is raised.
+
+Dependencies:
+- `requests`: Used to make HTTP requests to Keycloak.
+- `flask`: Utilized for raising HTTP errors and accessing application
+  configuration.
+
+Keycloak Configuration:
+The module relies on Flask's application configuration to retrieve Keycloak
+settings:
+- `KEYCLOAK_INTROSPECT_URI`: The URI of the Keycloak introspection endpoint.
+- `OIDC_CLIENT_ID`: The client ID for the application in Keycloak.
+- `OIDC_CREDENTIALS_SECRET`: The client secret for authentication.
+
+Raises:
+- `HTTP 500`: If there is an error connecting to the Keycloak server.
+- `HTTP 401`: If the token is invalid or expired.
+"""
+
 
 import requests
 

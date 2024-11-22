@@ -1,12 +1,27 @@
 # -*- coding: utf-8 -*-
+"""
+Module: decorators.py
 
-##############################################################
-# custom decorators for the Flask application                #
-##############################################################
+This module contains custom decorators for the Flask application. These
+decorators are used to enhance route functionality, such as setting themes,
+enabling analytics, caching responses, and protecting routes with Keycloak
+authentication.
+
+Decorators:
+- `set_theme`: Adds theme and portal name to the request context.
+- `set_matomo_enabled`: Enables Matomo analytics by adding relevant
+  configuration to the request context.
+- `caching`: Sets cache control headers for a route.
+- `keycloak_protected`: Protects routes with Keycloak authentication.
+
+Dependencies:
+- Flask
+- Keycloak authentication (via `verify_token` in `app.auth`)
+- Sentry (optional)
+"""
 
 import logging
 import os
-
 
 from functools import wraps
 from flask import request, make_response, current_app, abort, jsonify
@@ -16,6 +31,8 @@ from app.auth import verify_token
 from app.exceptions import TokenError
 
 if is_sentry_enabled():
+    # Import sentry_sdk only if Sentry is enabled
+    # Sentry is a monitoring service that provides real-time error reporting
     import sentry_sdk
 
 
@@ -76,6 +93,7 @@ def keycloak_protected(f):
     A decorator to protect routes with Keycloak authentication.
     Verifies the token only if Keycloak is enabled in the app configuration.
     """
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if current_app.config.get("KEYCLOAK_ENABLED", False):
@@ -88,7 +106,7 @@ def keycloak_protected(f):
 
                 token = auth_header.split(" ")[1]
                 verify_token(token)  # Verify the token with Keycloak
-                
+
             except TokenError as e:
                 # Log token-related errors
                 if is_sentry_enabled():
@@ -98,7 +116,7 @@ def keycloak_protected(f):
                 logging.error("Token error: %s", e)
                 response = {"error": e.args[0]}
                 return jsonify(response), e.status_code
-            
+
             except (KeyError, ValueError) as e:
                 # Handle specific errors
                 if is_sentry_enabled():
