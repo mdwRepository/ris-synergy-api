@@ -63,10 +63,12 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
 
-def download_json_data(url, params={}):
+def download_json_data(url, params=None):
     """
     Download JSON data from a URL.
     """
+    if params is None:
+        params = {}
     try:
         headers = {
             "Accept": "application/json",
