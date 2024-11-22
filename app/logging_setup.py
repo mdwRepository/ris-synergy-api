@@ -112,4 +112,3 @@ def create_log_folder():
         print(f"Info: log folder {log_folder} created")
     else:
         print(f"Info: log folder {log_folder} exists")
-    return
