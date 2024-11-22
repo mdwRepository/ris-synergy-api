@@ -63,10 +63,9 @@ import logging
 import json
 import os
 import re
-import yaml
-
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
+import yaml
 
 from flask import (
     Blueprint,
@@ -75,7 +74,6 @@ from flask import (
     abort,
     url_for,
 )
-from flask_negotiate import produces
 from flasgger import swag_from
 from werkzeug.utils import secure_filename
 
@@ -469,16 +467,16 @@ def get_organigram_by_date(date):
             return abort(400, description="Invalid date format. Use YYYY-MM-DD.")
 
         # Resolve the JSON directory path
-        BASE_DIR = Path(JSON_DIR).resolve()
+        base_dir = Path(JSON_DIR).resolve()
 
         # Sanitize the filename part
         safe_date = secure_filename(f"organigram_{date}.json")
 
         # Construct the file path
-        file_path = os.path.normpath(BASE_DIR / safe_date).resolve()
+        file_path = os.path.normpath(base_dir / safe_date).resolve()
 
-        # Check if the resolved path is still within BASE_DIR
-        if not str(file_path).startswith(str(BASE_DIR)):
+        # Check if the resolved path is still within base_dir
+        if not str(file_path).startswith(str(base_dir)):
             return abort(400, description="Invalid date input.")
 
         # Ensure the file exists and is accessible
