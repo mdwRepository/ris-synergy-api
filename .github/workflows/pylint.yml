@@ -22,7 +22,7 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py') --output=lint.txt || true
+        pylint $(git ls-files '*.py' | grep -v '^test_') --output=lint.txt || true
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
