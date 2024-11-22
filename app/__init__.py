@@ -119,12 +119,17 @@ def check_if_required_env_variables_are_set():
     return True
 
 
-# check if .env file exists and required environment variables are set
-if check_if_env_file_exists():
-    load_dotenv(override=True)
-if not check_if_required_env_variables_are_set():
-    sys.exit("Error: required environment variables not set")
+def validate_app_env():
+    """
+    Initializes the application by checking the .env file and required environment variables.
+    """
+    if check_if_env_file_exists():
+        load_dotenv(override=True)
+    if not check_if_required_env_variables_are_set():
+        sys.exit("Error: required environment variables not set")
 
+# Initialize the application environment
+validate_app_env()
 
 # Initialize Sentry if enabled
 if is_sentry_enabled():
