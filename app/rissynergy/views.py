@@ -184,13 +184,13 @@ def is_valid_yaml(file_path):
             yaml.safe_load(file)  # Try to parse the YAML file
         return True
     except yaml.YAMLError as e:
-        logging.error(f"Invalid YAML in {file_path}: {e}")
+        logging.error("Invalid YAML in %s: %s", file_path, e)
         return False
     except FileNotFoundError as e:
-        logging.error(f"Error reading {file_path}: {e}")
+        logging.error("Error reading %s: %s", file_path, e)
         return False
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        logging.error("An error occurred: %s", e)
         return False
 
 
@@ -211,7 +211,7 @@ def get_latest_json_file():
             raise FileNotFoundError("No JSON files found.")
         return files[0]
     except Exception as e:
-        logging.error(f"Error getting latest JSON file: {e}")
+        logging.error("Error getting latest JSON file: %s", e)
         return None
 
 
@@ -231,11 +231,11 @@ def replace_placeholder_in_file(
             return yaml.safe_load(content)
         else:
             raise ValueError("Unsupported file type")
-    except FileNotFoundError as e:
-        logging.error(f"File not found: {file_path}")
+    except FileNotFoundError:
+        logging.error("File not found: %s", file_path)
         return None
     except Exception as e:
-        logging.error(f"Error processing file {file_path}: {e}")
+        logging.error("Error processing file %s: %s", file_path, e)
         return None
 
 
@@ -252,7 +252,7 @@ def get_ris_synergy_schema():
             return abort(500, description="Internal server error")
         return jsonify(schema)
     except Exception as e:
-        logging.error(f"Error fetching JSON schema: {e}")
+        logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -268,7 +268,7 @@ def get_info_schema():
             return abort(500, description="Internal server error")
         return jsonify(schema)
     except Exception as e:
-        logging.error(f"Error fetching JSON schema: {e}")
+        logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -284,7 +284,7 @@ def show_info_schema_apidocs():
         # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
         return redirect(f"/apidocs?url={schema_url}")
     except Exception as e:
-        logging.error(f"Error redirecting to Swagger UI: {e}")
+        logging.error("Error redirecting to Swagger UI: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -305,7 +305,7 @@ def get_info():
             return abort(500, description="Internal server error")
         return jsonify(data)
     except Exception as e:
-        logging.error(f"Error fetching info data: {e}")
+        logging.error("Error fetching info data: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -322,7 +322,7 @@ def get_orgunit_schema():
             return abort(500, description="Internal server error")
         return jsonify(schema)
     except Exception as e:
-        logging.error(f"Error fetching JSON schema: {e}")
+        logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -338,7 +338,7 @@ def show_orgunits_schema_apidocs():
         # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
         return redirect(f"/apidocs?url={schema_url}")
     except Exception as e:
-        logging.error(f"Error redirecting to Swagger UI: {e}")
+        logging.error("Error redirecting to Swagger UI: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -362,7 +362,8 @@ def get_organigram():
         openapi_spec = replace_placeholder_in_file(ORGUNIT_OPENAPI_SPEC_PATH)
         if openapi_spec is None:
             logging.error(
-                f"Failed to load or replace placeholders in OpenAPI spec file: {ORGUNIT_OPENAPI_SPEC_PATH}"
+                "Failed to load or replace placeholders in OpenAPI spec file: %s", 
+                ORGUNIT_OPENAPI_SPEC_PATH
             )
             return abort(
                 500,
@@ -370,10 +371,10 @@ def get_organigram():
             )
 
         # Log the loaded OpenAPI spec for debugging (optional)
-        logging.debug(f"Processed OpenAPI Spec: {openapi_spec}")
+        logging.debug("Processed OpenAPI Spec: %s", openapi_spec)
 
     except Exception as e:
-        logging.error(f"Error loading OpenAPI spec: {e}")
+        logging.error("Error loading OpenAPI spec: %s", e)
         return abort(
             500, description="Internal server error while processing OpenAPI spec."
         )
@@ -381,7 +382,7 @@ def get_organigram():
     try:
         # Fetch the latest organigram data
         latest_file = get_latest_json_file()
-        logging.debug(f"Latest organigram data file: {latest_file}")
+        logging.debug("Latest organigram data file: %s", latest_file)
         if not latest_file:
             return abort(404, description="No organigram data available.")
 
@@ -393,15 +394,15 @@ def get_organigram():
             return jsonify(data)
 
     except json.JSONDecodeError as json_error:
-        logging.error(f"Error decoding JSON: {json_error}")
+        logging.error("Error decoding JSON: %s", json_error)
         return abort(500, description="Internal server error: JSON decoding error.")
     except FileNotFoundError as fnf_error:
-        logging.error(f"File not found: {fnf_error}")
+        logging.error("File not found: %s", fnf_error)
         return abort(
             500, description="Internal server error: Organigram file not found."
         )
     except Exception as e:
-        logging.error(f"Error fetching organigram data or Swagger definition: {e}")
+        logging.error("Error fetching organigram data or Swagger definition: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -440,13 +441,13 @@ def get_orgunit(id):
     # Handle exceptions
     # Log the error and return an error response
     except json.JSONDecodeError as json_error:
-        logging.error(f"Error decoding JSON: {json_error}")
+        logging.error("Error decoding JSON: %s", json_error)
         return abort(500, description="Internal server error: JSON decoding error.")
     except FileNotFoundError as fnf_error:
-        logging.error(f"File not found: {fnf_error}")
+        logging.error("File not found: %s", fnf_error)
         return abort(500, description="Internal server error")
     except Exception as e:
-        logging.error(f"Error fetching OrgUnit data: {e}")
+        logging.error("Error fetching OrgUnit data: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -493,10 +494,10 @@ def get_organigram_by_date(date):
     # Handle exceptions
     # Log the error and return an error response
     except json.JSONDecodeError as json_error:
-        logging.error(f"Error decoding JSON: {json_error}")
+        logging.error("Error decoding JSON: %s", json_error)
         return abort(500, description="Internal server error: JSON decoding error.")
     except Exception as e:
-        logging.error(f"Error fetching organigram data for date {date}: {e}")
+        logging.error("Error fetching organigram data for date %s: %s", date, e)
         return abort(500, description="Internal server error")
 
 
@@ -513,7 +514,7 @@ def get_project_schema():
             return abort(500, description="Internal server error")
         return jsonify(schema)
     except Exception as e:
-        logging.error(f"Error fetching JSON schema: {e}")
+        logging.error("Error fetching JSON schema: %s", e)
         return abort(500, description="Internal server error")
 
 
@@ -529,5 +530,5 @@ def show_projects_schema_apidocs():
         # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
         return redirect(f"/apidocs?url={schema_url}")
     except Exception as e:
-        logging.error(f"Error redirecting to Swagger UI: {e}")
+        logging.error("Error redirecting to Swagger UI: %s", e)
         return abort(500, description="Internal server error")
