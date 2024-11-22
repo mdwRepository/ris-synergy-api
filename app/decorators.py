@@ -32,7 +32,9 @@ from app.auth import verify_token
 from app.exceptions import TokenError
 
 # content negotiation toggler
-ENFORCE_CONTENT_NEGOTIATION = os.getenv("ENFORCE_CONTENT_NEGOTIATION", "True").lower() == "true"
+ENFORCE_CONTENT_NEGOTIATION = (
+    os.getenv("ENFORCE_CONTENT_NEGOTIATION", "True").lower() == "true"
+)
 
 
 if is_sentry_enabled():
@@ -136,8 +138,14 @@ def keycloak_protected(f):
 
 
 def conditional_produces(mime_type):
+    """
+    A decorator to conditionally enforce content negotiation based on the
+    `ENFORCE_CONTENT_NEGOTIATION` environment variable.
+    """
+
     def decorator(func):
         if ENFORCE_CONTENT_NEGOTIATION:
             return produces(mime_type)(func)
         return func
+
     return decorator
