@@ -10,7 +10,7 @@ import json
 
 # from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-from flask import Flask, g
+from flask import Flask, g, Response
 from flasgger import Swagger
 from os import getenv
 
@@ -304,4 +304,12 @@ def apply_clickjacking_protection(response):
         )
         response.headers["Content-Security-Policy"] = "frame-ancestors 'self'"
     response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+@app.after_request
+def apply_hsts(response: Response) -> Response:
+    # Enforce HTTPS-only communication for 1 year (in seconds)
+    # `includeSubDomains` applies HSTS to all subdomains.
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     return response
