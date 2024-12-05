@@ -18,6 +18,7 @@ from app import (
     register_blueprints,
     register_extensions,
     validate_app_env,
+    apply_csp,
 )
 
 
@@ -57,6 +58,22 @@ def test_flask_app():
             response.headers["Content-Security-Policy"] = "frame-ancestors 'self'"
         response.headers["X-Content-Type-Options"] = "nosniff"
         return response
+
+    return app
+
+
+@pytest.fixture
+def app_with_csp():
+    """Fixture to create a Flask app with the after_request CSP applied."""
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+
+    @app.route("/test")
+    def test_route():
+        return jsonify({"message": "Test response"})
+
+    # Register the actual apply_csp function
+    app.after_request(apply_csp)
 
     return app
 
@@ -534,10 +551,35 @@ def test_apply_clickjacking_protection_allowed_sources(client, monkeypatch):
     Test the apply_clickjacking_protection function when ALLOWED_SOURCES is set.
     """
     monkeypatch.setenv("ALLOWED_SOURCES", "https://example.com")
-    
+
     response = client.get("/test")
     assert response.status_code == 200
     assert response.headers["X-Frame-Options"] == "ALLOW-FROM  https://example.com"
-    assert response.headers["Content-Security-Policy"] == "frame-ancestors https://example.com"
+    assert (
+        response.headers["Content-Security-Policy"]
+        == "frame-ancestors https://example.com"
+    )
     assert response.headers["X-Content-Type-Options"] == "nosniff"
 
+
+def test_apply_csp(app_with_csp):
+    """Test that the CSP header is applied to responses."""
+    with app_with_csp.test_client() as client:
+        response = client.get("/test")
+
+        # Check if the response contains the Content-Security-Policy header
+        assert response.status_code == 200
+        assert "Content-Security-Policy" in response.headers
+
+        # Validate the CSP header content
+        csp = response.headers["Content-Security-Policy"]
+        assert "default-src 'self'" in csp
+        assert "script-src 'self'" in csp
+        assert "style-src 'self'" in csp
+        assert "img-src 'self'" in csp
+        assert "font-src 'self'" in csp
+        assert "frame-ancestors 'self'" in csp
+        assert "object-src 'none'" in csp
+        assert "connect-src 'self'" in csp
+        assert "base-uri 'self'" in csp
+        assert "form-action 'self'" in csp
