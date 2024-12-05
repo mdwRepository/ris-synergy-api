@@ -69,24 +69,6 @@ blueprint = Blueprint(
 )
 
 
-@blueprint.route("/static/<path:filename>")
-def custom_static(filename):
-    """
-    Serve static files with custom headers
-    """
-    try:
-        response = send_from_directory(static_folder, filename)
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        return response
-    except FileNotFoundError as e:
-        logging.error("File not found: %s - %s", filename, e)
-        # Explicitly return a JSON response
-        return jsonify({"error": "File not found"}), 404
-    except PermissionError as e:
-        logging.error("Permission denied: %s - %s", filename, e)
-        return jsonify({"error": "Permission denied"}), 403
-
-
 @blueprint.route("/", methods=["GET", "POST"])
 @set_theme
 @set_matomo_enabled
