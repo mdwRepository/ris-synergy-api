@@ -4,6 +4,7 @@ Module for testing decorators in the Flask application.
 """
 
 import pytest
+from unittest.mock import patch
 from flask import Flask, request, jsonify
 from app.decorators import (
     set_theme,
@@ -12,6 +13,7 @@ from app.decorators import (
     keycloak_protected,
     conditional_produces,
 )
+from app.exceptions import TokenError
 
 
 @pytest.fixture
@@ -53,6 +55,28 @@ def app_with_context():
         yield app
 
 
+@pytest.fixture
+def app_with_keycloak(monkeypatch):
+    """Fixture to create a Flask app with Keycloak protection enabled."""
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+    app.config["KEYCLOAK_ENABLED"] = True
+
+    @app.route("/protected")
+    @keycloak_protected
+    def protected_route():
+        return jsonify({"message": "Access granted"}), 200
+
+    @app.errorhandler(401)
+    def unauthorized_error(error):
+        """
+        Custom handler for 401 Unauthorized errors to ensure JSON responses.
+        """
+        return jsonify({"error": error.description}), 401
+
+    return app
+
+
 def test_set_theme(app_with_context, monkeypatch):
     """Test the set_theme decorator."""
     monkeypatch.setenv("THEME", "default")
@@ -92,3 +116,80 @@ def test_conditional_produces(app_with_context):
     response = client.get("/content", headers={"Accept": "application/json"})
     assert response.status_code == 200
     assert response.json == {"content": "some content"}
+
+
+def test_keycloak_protected_valid_token(app_with_keycloak):
+    """Test the decorator with a valid token."""
+    with app_with_keycloak.test_client() as client:
+        with patch("app.decorators.verify_token") as mock_verify_token:
+            mock_verify_token.return_value = True
+            headers = {"Authorization": "Bearer valid_token"}
+            response = client.get("/protected", headers=headers)
+
+            assert response.status_code == 200
+            assert response.get_json() == {"message": "Access granted"}
+
+
+def test_keycloak_protected_missing_header(app_with_keycloak):
+    """Test the decorator with a missing Authorization header."""
+    with app_with_keycloak.test_client() as client:
+        response = client.get("/protected")
+
+        assert response.status_code == 401
+        assert (
+            response.get_json()["error"] == "Authorization header missing or malformed"
+        )
+
+
+def test_keycloak_protected_malformed_header(app_with_keycloak):
+    """Test the decorator with a malformed Authorization header."""
+    with app_with_keycloak.test_client() as client:
+        headers = {"Authorization": "InvalidHeader"}
+        response = client.get("/protected", headers=headers)
+
+        assert response.status_code == 401
+        assert (
+            response.get_json()["error"] == "Authorization header missing or malformed"
+        )
+
+
+def test_keycloak_protected_token_error(app_with_keycloak):
+    """Test the decorator with a token error raised by verify_token."""
+    with app_with_keycloak.test_client() as client:
+        with patch("app.decorators.verify_token") as mock_verify_token:
+            mock_verify_token.side_effect = TokenError("Invalid token", 401)
+            headers = {"Authorization": "Bearer invalid_token"}
+            response = client.get("/protected", headers=headers)
+
+            assert response.status_code == 401
+            assert response.get_json() == {"error": "Invalid token"}
+
+
+def test_keycloak_protected_key_error(app_with_keycloak):
+    """Test the decorator with a KeyError during token verification."""
+    with app_with_keycloak.test_client() as client:
+        with patch("app.decorators.verify_token") as mock_verify_token:
+            mock_verify_token.side_effect = KeyError("Key missing")
+            headers = {"Authorization": "Bearer valid_token"}
+            response = client.get("/protected", headers=headers)
+
+            assert response.status_code == 400
+            assert response.get_json() == {"error": "Key missing"}
+
+
+def test_keycloak_protected_keycloak_disabled():
+    """Test the decorator when Keycloak is disabled."""
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+    app.config["KEYCLOAK_ENABLED"] = False  # Keycloak is disabled
+
+    @app.route("/protected")
+    @keycloak_protected
+    def protected_route():
+        return jsonify({"message": "Access granted without Keycloak"})
+
+    with app.test_client() as client:
+        response = client.get("/protected")
+
+        assert response.status_code == 200
+        assert response.get_json() == {"message": "Access granted without Keycloak"}
