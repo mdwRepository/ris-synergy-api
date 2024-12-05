@@ -272,7 +272,7 @@ def get_info_schema():
 
 
 @blueprint.route("/ris-synergy/apidocs/info", methods=["GET"])
-@swag_from(PROJECT_OPENAPI_SPEC_PATH)
+@swag_from(INFO_OPENAPI_SPEC_PATH)
 def show_info_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for info schema.
@@ -285,7 +285,7 @@ def show_info_schema_apidocs():
 
 @blueprint.route("/ris-synergy/v1/info", methods=["GET"], endpoint="info")
 @swag_from(
-    ORGUNIT_OPENAPI_SPEC_PATH,
+    INFO_OPENAPI_SPEC_PATH,
     endpoint="ris-synergy.info",
     methods=["GET"],
 )
@@ -322,7 +322,7 @@ def get_orgunit_schema():
 
 
 @blueprint.route("/ris-synergy/apidocs/orgunit", methods=["GET"])
-@swag_from(PROJECT_OPENAPI_SPEC_PATH)
+@swag_from(ORGUNIT_OPENAPI_SPEC_PATH)
 def show_orgunits_schema_apidocs():
     """
     Redirect to the Swagger UI with the search field pre-filled for orgunit schema.
