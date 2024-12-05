@@ -236,6 +236,7 @@ solr_search_results = d.solr_query(
         "dc.title.en",
         "crisou.acronym",
         "dc.title.alternative",
+        "dc.title.alternative.en",
         "dc.title.alternative.de",
         "dc.title.alternative.fr",
         "dc.title.alternative.sl",
