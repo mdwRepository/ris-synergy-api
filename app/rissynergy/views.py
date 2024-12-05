@@ -226,7 +226,13 @@ def replace_placeholder_in_file(
         if file_path.endswith(".yaml") or file_path.endswith(".yml"):
             return yaml.safe_load(content)
         raise ValueError("Unsupported file type")
-    except (FileNotFoundError, json.JSONDecodeError, yaml.YAMLError, ValueError, OSError) as e:
+    except (
+        FileNotFoundError,
+        json.JSONDecodeError,
+        yaml.YAMLError,
+        ValueError,
+        OSError,
+    ) as e:
         logging.error("Error processing file %s: %s", file_path, e)
         return None
 
@@ -241,11 +247,11 @@ def get_ris_synergy_schema():
     try:
         schema = replace_placeholder_in_file(RIS_SYNERGY_SCHEMA_PATH)
         if schema is None:
-            return abort(500, description="Internal server error")
+            return jsonify({"error": "Internal server error"}), 500
         return jsonify(schema)
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as e:
         logging.error("Error fetching JSON schema: %s", e)
-        return abort(500, description="Internal server error")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @blueprint.route("/ris-synergy/v1/info/schema", methods=["GET"])
@@ -258,11 +264,11 @@ def get_info_schema():
     try:
         schema = replace_placeholder_in_file(INFO_SCHEMA_PATH)
         if schema is None:
-            return abort(500, description="Internal server error")
+            return jsonify({"error": "Internal server error"}), 500
         return jsonify(schema)
     except (FileNotFoundError, ValueError, json.JSONDecodeError, yaml.YAMLError) as e:
         logging.error("Error fetching JSON schema: %s", e)
-        return abort(500, description="Internal server error")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @blueprint.route("/ris-synergy/apidocs/info", methods=["GET"])
@@ -487,4 +493,3 @@ def show_projects_schema_apidocs():
     schema_url = url_for("ris-synergy.get_project_schema", _external=True)
     # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
     return redirect(f"/apidocs?url={schema_url}")
-    
