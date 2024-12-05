@@ -108,7 +108,6 @@ def keycloak_protected(f):
                 # Token extraction and verification
                 auth_header = request.headers.get("Authorization", None)
                 if not auth_header or not auth_header.startswith("Bearer "):
-                    # Skip logging this specific error to Sentry
                     abort(401, description="Authorization header missing or malformed")
 
                 token = auth_header.split(" ")[1]
@@ -117,7 +116,6 @@ def keycloak_protected(f):
             except TokenError as e:
                 # Log token-related errors
                 if is_sentry_enabled():
-                    # Skip logging this specific error to Sentry
                     if e.args[0] != "Authorization header missing or malformed":
                         sentry_sdk.capture_exception(e)
                 logging.error("Token error: %s", e)
@@ -125,11 +123,10 @@ def keycloak_protected(f):
                 return jsonify(response), e.status_code
 
             except (KeyError, ValueError) as e:
-                # Handle specific errors
                 if is_sentry_enabled():
                     sentry_sdk.capture_exception(e)
                 logging.error("Error during token verification: %s", e)
-                response = {"error": str(e)}
+                response = {"error": str(e).strip("'")}  # Strip extra quotes
                 return jsonify(response), 400
 
         return f(*args, **kwargs)
