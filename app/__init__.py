@@ -128,6 +128,7 @@ def validate_app_env():
     if not check_if_required_env_variables_are_set():
         sys.exit("Error: required environment variables not set")
 
+
 # Initialize the application environment
 validate_app_env()
 
@@ -386,18 +387,41 @@ def apply_clickjacking_protection(response):
 
 @app.after_request
 def apply_csp(response: Response) -> Response:
+    """
+    Apply a Content Security Policy (CSP) to enhance the security of all HTTP responses.
+
+    This policy defines the sources from which content can be loaded, helping to
+    mitigate risks such as cross-site scripting (XSS) and data injection attacks.
+
+    The CSP applied includes:
+    - Allowing scripts, styles, images, and fonts only from trusted sources.
+    - Restricting frame ancestors to 'self'.
+    - Disabling use of <object> elements (object-src 'none').
+    - Limiting connections, base URIs, and form actions to 'self'.
+
+    Parameters:
+    response (Response): The HTTP response object to which CSP headers will be added.
+
+    Returns:
+    Response: The modified HTTP response with the CSP header applied.
+    """
     csp = (
         "default-src 'self'; "
-        "script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js; "
-        "https://code.jquery.com/jquery-3.3.1.slim.min.js https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js; "
-        "style-src 'self' https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css; "
+        "script-src 'self' "
+        "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js "
+        "https://code.jquery.com/jquery-3.3.1.slim.min.js "
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js; "
+        "style-src 'self' "
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css; "
         "img-src 'self'; "
-        "font-src 'self' https://fonts.gstatic.com/s/oswald/v53/TK3_WkUHHAIjg75cFRf3bXL8LICs1_FvsUZiZQ.woff2; "
+        "font-src 'self' "
+        "https://fonts.gstatic.com/s/oswald/v53/"
+        "TK3_WkUHHAIjg75cFRf3bXL8LICs1_FvsUZiZQ.woff2; "
         "frame-ancestors 'self'; "
         "object-src 'none'; "
         "connect-src 'self'; "
         "base-uri 'self'; "
-        "form-action 'self'"
+        "form-action 'self';"
     )
-    response.headers['Content-Security-Policy'] = csp
+    response.headers["Content-Security-Policy"] = csp
     return response
