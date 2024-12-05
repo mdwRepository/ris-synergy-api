@@ -19,6 +19,7 @@ from app import (
     register_extensions,
     validate_app_env,
     apply_csp,
+    apply_clickjacking_protection,
 )
 
 
@@ -45,19 +46,21 @@ def test_flask_app():
         g.request_start_time = time.time()
         g.request_time = lambda: f"{time.time() - g.request_start_time:.5f}s"
 
-    @app.after_request
-    def apply_clickjacking_protection(response):
-        allowed_sources = os.getenv("ALLOWED_SOURCES")
-        if allowed_sources:
-            response.headers["X-Frame-Options"] = f"ALLOW-FROM  {allowed_sources}"
-            response.headers["Content-Security-Policy"] = (
-                f"frame-ancestors {allowed_sources}"
-            )
-        else:
-            response.headers["X-Frame-Options"] = "SAMEORIGIN"
-            response.headers["Content-Security-Policy"] = "frame-ancestors 'self'"
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        return response
+    return app
+
+
+@pytest.fixture
+def app_with_clickjacking_protection(monkeypatch):
+    """Fixture to create a Flask app with the after_request clickjacking protection applied."""
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+
+    @app.route("/test")
+    def test_route():
+        return jsonify({"message": "Test response"})
+
+    # Register the actual apply_clickjacking_protection function
+    app.after_request(apply_clickjacking_protection)
 
     return app
 
@@ -74,6 +77,22 @@ def app_with_csp():
 
     # Register the actual apply_csp function
     app.after_request(apply_csp)
+
+    return app
+
+
+@pytest.fixture
+def app_with_clickjacking_protection(monkeypatch):
+    """Fixture to create a Flask app with the after_request clickjacking protection applied."""
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+
+    @app.route("/test")
+    def test_route():
+        return jsonify({"message": "Test response"})
+
+    # Register the actual apply_clickjacking_protection function
+    app.after_request(apply_clickjacking_protection)
 
     return app
 
@@ -583,3 +602,40 @@ def test_apply_csp(app_with_csp):
         assert "connect-src 'self'" in csp
         assert "base-uri 'self'" in csp
         assert "form-action 'self'" in csp
+
+
+def test_apply_clickjacking_protection_default(
+    app_with_clickjacking_protection, monkeypatch
+):
+    """Test the default clickjacking protection headers."""
+    # Override ALLOWED_SOURCES to ensure default behavior
+    monkeypatch.delenv("ALLOWED_SOURCES", raising=False)
+
+    with app_with_clickjacking_protection.test_client() as client:
+        response = client.get("/test")
+
+        # Check for default headers
+        assert response.status_code == 200
+        assert response.headers["X-Frame-Options"] == "SAMEORIGIN"
+        assert response.headers["Content-Security-Policy"] == "frame-ancestors 'self'"
+        assert response.headers["X-Content-Type-Options"] == "nosniff"
+
+
+def test_apply_clickjacking_protection_allowed_sources(
+    app_with_clickjacking_protection, monkeypatch
+):
+    """Test clickjacking protection headers when ALLOWED_SOURCES is set."""
+    allowed_sources = "https://example.com"
+    monkeypatch.setenv("ALLOWED_SOURCES", allowed_sources)
+
+    with app_with_clickjacking_protection.test_client() as client:
+        response = client.get("/test")
+
+        # Check headers for allowed sources
+        assert response.status_code == 200
+        assert response.headers["X-Frame-Options"] == f"ALLOW-FROM  {allowed_sources}"
+        assert (
+            response.headers["Content-Security-Policy"]
+            == f"frame-ancestors {allowed_sources}"
+        )
+        assert response.headers["X-Content-Type-Options"] == "nosniff"
