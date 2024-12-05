@@ -304,7 +304,7 @@ def get_info():
         return abort(500, description="Internal server error")
 
 
-@blueprint.route("/ris-synergy/v1/orgUnits/organigram/schema", methods=["GET"])
+@blueprint.route("/ris-synergy/v1/orgUnits/schema", methods=["GET"])
 @conditional_produces("application/json")
 def get_orgunit_schema():
     """
