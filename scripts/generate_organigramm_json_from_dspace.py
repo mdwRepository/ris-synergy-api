@@ -374,7 +374,7 @@ for doc in solr_docs:
     }
     output.append(json_obj)
 
-# Output the results as JSON file with name "organigramm_YYYY-MM-DD.json"
+# Output the results as JSON file with name "organigram_YYYY-MM-DD.json"
 # YYYY-MM-DD is today's date
 logging.debug(json.dumps(output, indent=4, ensure_ascii=False))
 today = datetime.datetime.now().isoformat()
