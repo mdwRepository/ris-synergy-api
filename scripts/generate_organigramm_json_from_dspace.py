@@ -244,6 +244,12 @@ solr_search_results = d.solr_query(
         "mdwrepo.orgunit.hasTopOrgUnit_authority",
         "organization.address.addressCountry",
         "organization.address.addressLocality",
+        "risorgunit.postAddress.addrline1",
+        "risorgunit.postAddress.postCode",
+        "risorgunit.electronicAddress.telephone",
+        "risorgunit.electronicAddress.fax",
+        "risorgunit.electronicAddress.email",
+        "oairecerif.identifier.url",
         "organization.parentOrganization",
         "organization.parentOrganization_authority",
         "mdwonline.validFrom",
@@ -328,19 +334,40 @@ for doc in solr_docs:
             {"trans": "H", "text": get_text_field(doc["dc.title.alternative"])}
         )
 
+    # Prepare the electronicAddress field
+    electronic_address = []
+
+    # Mapping of SOLR fields to their prefixes
+    contact_fields = {
+        "risorgunit.electronicAddress.email": "email:",
+        "risorgunit.electronicAddress.telephone": "tel:",
+        "risorgunit.electronicAddress.fax": "fax:",
+    }
+
+    for field, prefix in contact_fields.items():
+        if field in doc:
+            # Ensure the value is a string
+            contact_value = get_text_field(doc[field])
+            if contact_value:
+                electronic_address.append(f"{prefix}{contact_value}")
+
     # Construct the JSON object
     json_obj = {
         "id": doc.get("search.resourceid"),
         "name": name_field,
         "type": doc.get("risorgunit.type", ""),
         "acronym": doc.get("crisou.acronym", ""),
-        "electronicAddress": [],
         "identifiers": [],
         "address": {
             "countryCode": doc.get("organization.address.addressCountry", ""),
-            **parsed_address,  # Merge parsed address parts
+            # **parsed_address,  # Merge parsed address parts
+            "addrline1": doc.get("risorgunit.postAddress.addrline1", ""),
+            "postCode": doc.get("risorgunit.postAddress.postCode", ""),
+            "cityTown": doc.get("organization.address.addressLocality", ""),
             "stateOfCountry": "Austria",
         },
+        "electronicAddress": electronic_address,
+        "website": doc.get("oairecerif.identifier.url", ""),
         "level": "LEVEL_" + str(level_mapping.get(doc.get("search.resourceid"), "")),
         "partOf": doc.get("organization.parentOrganization_authority", ""),
         "startDate": start_date,  # Use the validated start_date
