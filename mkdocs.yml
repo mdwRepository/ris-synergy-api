@@ -4,7 +4,6 @@ site_description: Documentation for the RIS Synergy Server Flask Implementation
 repo_name: mdwRepository/ris-synergy-api
 docs_dir: docs
 
-
 theme:
   name: material
   language: en
@@ -14,6 +13,8 @@ theme:
 
 nav:
   - Home: index.md
+  - RIS Synergy: ris_synergy.md
+  - API: api_framework.md
 
 plugins:
   - i18n:
@@ -33,6 +34,8 @@ plugins:
           site_name: "RIS Synergy Server - Flask Implementation Documentation (de)"
           nav_translations:
             Home: Startseite
+            RIS Synergy: RIS Synergy
+            API: API
       nav_translations:
         de:
           Home: Startseite
