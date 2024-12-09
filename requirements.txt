@@ -24,7 +24,7 @@ jsonschema-specifications==2024.10.1
 mistune==3.0.2 
 packaging==24.2 
 referencing==0.35.1 
-rpds-py==0.21.0 
+rpds-py==0.22.3 
 six==1.16.0 
 # other
 pytz==2024.2
