@@ -1,0 +1,47 @@
+site_name: RIS Synergy Server - Flask Implementation Documentation
+site_url: https://example.com
+site_description: Documentation for the RIS Synergy Server Flask Implementation
+repo_name: mdwRepository/ris-synergy-api
+docs_dir: docs
+
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+
+nav:
+  - Home: index.md
+
+plugins:
+  - i18n:
+      default_language: en
+      docs_structure: suffix
+      material_alternate: true
+      reconfigure_material: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+          site_name: "RIS Synergy Server - Flask Implementation Documentation (en)"
+        - locale: de
+          name: Deutsch
+          build: true
+          site_name: "RIS Synergy Server - Flask Implementation Documentation (de)"
+          nav_translations:
+            Home: Startseite
+      nav_translations:
+        de:
+          Home: Startseite
+
+extra:
+  alternate: 
+    - name: en - English
+      link: ./
+      lang: en
+    - name: de - Deutsch
+      link: ./de/
+      lang: de
