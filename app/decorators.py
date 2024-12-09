@@ -35,8 +35,6 @@ from app.exceptions import TokenError
 ENFORCE_CONTENT_NEGOTIATION = (
     os.getenv("ENFORCE_CONTENT_NEGOTIATION", "True").lower() == "true"
 )
-# Read enabled endpoints from the environment
-ENABLED_ENDPOINTS = os.getenv("ENABLED_ENDPOINTS", "").split(",")
 
 
 if is_sentry_enabled():
@@ -159,7 +157,11 @@ def enabled_endpoint(endpoint_name):
     def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
-            if endpoint_name not in ENABLED_ENDPOINTS:
+            enabled_endpoints = os.getenv("ENABLED_ENDPOINTS", "").split(",")
+            logging.debug("Enabled endpoints: %s", enabled_endpoints)
+            logging.debug("Checking endpoint: %s", endpoint_name)
+
+            if endpoint_name not in enabled_endpoints:
                 abort(404)  # Return 404 if endpoint is disabled
             return func(*args, **kwargs)
 
