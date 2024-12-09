@@ -76,7 +76,7 @@ from flask import (
 from flasgger import swag_from
 from werkzeug.utils import secure_filename
 
-from app.decorators import keycloak_protected, conditional_produces
+from app.decorators import keycloak_protected, conditional_produces, enabled_endpoint
 
 
 static_url_path = os.getenv("STATIC_URL_PATH") or None
@@ -305,6 +305,7 @@ def get_info():
 
 
 @blueprint.route("/ris-synergy/v1/orgUnits/schema", methods=["GET"])
+@enabled_endpoint("orgunit")
 @conditional_produces("application/json")
 def get_orgunit_schema():
     """
@@ -322,6 +323,7 @@ def get_orgunit_schema():
 
 
 @blueprint.route("/ris-synergy/apidocs/orgunit", methods=["GET"])
+@enabled_endpoint("orgunit")
 @swag_from(ORGUNIT_OPENAPI_SPEC_PATH)
 def show_orgunits_schema_apidocs():
     """
@@ -341,6 +343,7 @@ def show_orgunits_schema_apidocs():
     endpoint="ris-synergy.organigram",
     methods=["GET"],
 )
+@enabled_endpoint("orgunit")
 @keycloak_protected
 @conditional_produces("application/json")
 def get_organigram():
@@ -390,6 +393,7 @@ def get_organigram():
     endpoint="ris-synergy.get_orgunit",
     methods=["GET"],
 )
+@enabled_endpoint("orgunit")
 @keycloak_protected
 @conditional_produces("application/json")
 def get_orgunit(orgunit_id):
@@ -426,6 +430,7 @@ def get_orgunit(orgunit_id):
     methods=["GET"],
     endpoint="organigram_by_date",
 )
+@enabled_endpoint("orgunit")
 @keycloak_protected
 @conditional_produces("application/json")
 def get_organigram_by_date(date):
@@ -467,6 +472,7 @@ def get_organigram_by_date(date):
 
 
 @blueprint.route("/ris-synergy/v1/projects/schema", methods=["GET"])
+@enabled_endpoint("project")
 @conditional_produces("application/json")
 def get_project_schema():
     """
@@ -484,6 +490,7 @@ def get_project_schema():
 
 
 @blueprint.route("/ris-synergy/apidocs/project", methods=["GET"])
+@enabled_endpoint("project")
 @swag_from(PROJECT_OPENAPI_SPEC_PATH)
 def show_projects_schema_apidocs():
     """
