@@ -1,3 +1,0 @@
-# Sentry
-certifi==2024.8.30
-sentry-sdk==2.19.2

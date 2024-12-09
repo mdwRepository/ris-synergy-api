@@ -1,1 +1,0 @@
-# RIS Synergy Server - Flask Implementation
