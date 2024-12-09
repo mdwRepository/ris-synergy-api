@@ -3,6 +3,7 @@
 Module for testing decorators in the Flask application.
 """
 
+import os
 import pytest
 from unittest.mock import patch
 from flask import Flask, request, jsonify
@@ -12,6 +13,7 @@ from app.decorators import (
     caching,
     keycloak_protected,
     conditional_produces,
+    enabled_endpoint,
 )
 from app.exceptions import TokenError
 
@@ -73,6 +75,25 @@ def app_with_keycloak(monkeypatch):
         Custom handler for 401 Unauthorized errors to ensure JSON responses.
         """
         return jsonify({"error": error.description}), 401
+
+    return app
+
+
+@pytest.fixture
+def app_with_decorator():
+    """Fixture to create a Flask app for testing."""
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+
+    @app.route("/enabled-endpoint")
+    @enabled_endpoint("enabled-endpoint")
+    def enabled_route():
+        return jsonify({"message": "This endpoint is enabled"})
+
+    @app.route("/disabled-endpoint")
+    @enabled_endpoint("disabled-endpoint")
+    def disabled_route():
+        return jsonify({"message": "This endpoint is disabled"})
 
     return app
 
@@ -193,3 +214,28 @@ def test_keycloak_protected_keycloak_disabled():
 
         assert response.status_code == 200
         assert response.get_json() == {"message": "Access granted without Keycloak"}
+
+
+def test_enabled_endpoint(app_with_decorator):
+    """Test an enabled endpoint."""
+    with patch.dict(os.environ, {"ENABLED_ENDPOINTS": "enabled-endpoint"}):
+        with app_with_decorator.test_client() as client:
+            response = client.get("/enabled-endpoint")
+            assert response.status_code == 200
+            assert response.get_json() == {"message": "This endpoint is enabled"}
+
+
+def test_disabled_endpoint(app_with_decorator):
+    """Test a disabled endpoint."""
+    with patch.dict(os.environ, {"ENABLED_ENDPOINTS": "enabled-endpoint"}):
+        with app_with_decorator.test_client() as client:
+            response = client.get("/disabled-endpoint")
+            assert response.status_code == 404
+
+
+def test_no_enabled_endpoints(app_with_decorator):
+    """Test behavior when no endpoints are enabled."""
+    with patch.dict(os.environ, {"ENABLED_ENDPOINTS": ""}):
+        with app_with_decorator.test_client() as client:
+            response = client.get("/enabled-endpoint")
+            assert response.status_code == 404
