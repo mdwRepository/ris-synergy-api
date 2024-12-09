@@ -1,4 +1,4 @@
-# RIS Synergy API - Flask Implementation
+# RIS Synergy Server - Flask Implementation
 
 
 [![Pylint](https://github.com/mdwRepository/ris-synergy-api/actions/workflows/pylint.yml/badge.svg)](https://github.com/mdwRepository/ris-synergy-api/actions/workflows/pylint.yml)
@@ -17,7 +17,7 @@ RIS Synergy is a collaborative initiative to enhance Austria's research infrastr
 RIS Synergy fosters interoperability and transparency among Austrian research institutions, funding agencies, and public administration systems by developing APIs, a centralized Registry, and automated data workflows.
 
 
-## About the RIS Synergy Portal
+## About the RIS Synergy Server
 
 
 This repository contains the source code and implementations for the RIS Synergy Server in Python / Flask. At its heart is the RESTful API designed to facilitate the exchange of research metadata, such as organizational structures, projects, and funding information.
