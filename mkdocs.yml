@@ -15,6 +15,7 @@ nav:
   - Home: index.md
   - RIS Synergy: ris_synergy.md
   - API: api_framework.md
+  - Routes: routes.md
 
 plugins:
   - i18n:
@@ -36,6 +37,7 @@ plugins:
             Home: Startseite
             RIS Synergy: RIS Synergy
             API: API
+            Routes: Routen
       nav_translations:
         de:
           Home: Startseite
