@@ -146,3 +146,25 @@ def conditional_produces(mime_type):
         return func
 
     return decorator
+
+
+def enabled_endpoint(endpoint_name):
+    """
+    Decorator to check if an endpoint is enabled.
+    If not enabled, the endpoint will return a 404 Not Found.
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            enabled_endpoints = os.getenv("ENABLED_ENDPOINTS", "").split(",")
+            logging.debug("Enabled endpoints: %s", enabled_endpoints)
+            logging.debug("Checking endpoint: %s", endpoint_name)
+
+            if endpoint_name not in enabled_endpoints:
+                abort(404)  # Return 404 if endpoint is disabled
+            return func(*args, **kwargs)
+
+        return wrapped
+
+    return decorator
