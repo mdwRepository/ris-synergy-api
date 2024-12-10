@@ -64,6 +64,7 @@ import json
 import os
 import re
 from pathlib import Path
+from urllib.parse import urljoin
 import yaml
 
 from flask import (
@@ -278,7 +279,7 @@ def show_info_schema_apidocs():
     Redirect to the Swagger UI with the search field pre-filled for info schema.
     """
     # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_info_schema", _external=True)
+    schema_url = urljoin(OPEN_API_SERVER_URL, url_for("ris-synergy.get_info_schema"))
     # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
     return redirect(f"/apidocs?url={schema_url}")
 
@@ -330,7 +331,7 @@ def show_orgunits_schema_apidocs():
     Redirect to the Swagger UI with the search field pre-filled for orgunit schema.
     """
     # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_orgunit_schema", _external=True)
+    schema_url = urljoin(OPEN_API_SERVER_URL, url_for("ris-synergy.get_orgunit_schema"))
     # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
     return redirect(f"/apidocs?url={schema_url}")
 
@@ -497,6 +498,6 @@ def show_projects_schema_apidocs():
     Redirect to the Swagger UI with the search field pre-filled for project schema.
     """
     # Use url_for to dynamically build the path to the schema endpoint
-    schema_url = url_for("ris-synergy.get_project_schema", _external=True)
+    schema_url =  urljoin(OPEN_API_SERVER_URL, url_for("ris-synergy.get_project_schema"))
     # Redirect to the Flasgger documentation UI with the schema URL as a query parameter
     return redirect(f"/apidocs?url={schema_url}")
