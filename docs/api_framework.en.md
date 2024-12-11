@@ -72,10 +72,12 @@ The OpenAIRE Guidelines for CRIS Managers are designed to standardize research i
 The guidelines facilitate the creation of FAIR-compliant (Findable, Accessible, Interoperable, and Reusable) research data by defining data models, formats, and protocols. This supports open science goals by enabling machine-readable and standardized metadata across platforms.
 
 
-### CERIF and FAIR Impact
+### CERIF
 
 
-The CERIF model, developed by euroCRIS, underpins the OpenAIRE guidelines by offering a structured and semantic representation of research information. CERIF models data through entities (like projects, funding, publications, and organizations) and the relationships between them. By using CERIF as a foundation, the OpenAIRE guidelines ensure that research information adheres to FAIR principles:
+The CERIF model, developed by euroCRIS, underpins the OpenAIRE guidelines by offering a structured and semantic representation of research information. CERIF models data through entities (like projects, funding, publications, and organizations) and the relationships between them.
+
+### FAIR principles
 
 
 - Findable: Data is enriched with unique identifiers and standardized metadata.
