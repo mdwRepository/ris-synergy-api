@@ -28,7 +28,7 @@ rpds-py==0.22.3
 six==1.17.0 
 # other
 pytz==2024.2
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
 idna==3.10 
 requests==2.32.3
 urllib3==2.3.0
