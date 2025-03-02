@@ -1,7 +1,7 @@
 bandit==1.8.2 
 markdown-it-py==3.0.0 
 mdurl==0.1.2 
-pbr==6.1.0 
+pbr==6.1.1 
 pygments==2.19.1 
 rich==13.9.4 
 stevedore==5.4.0
