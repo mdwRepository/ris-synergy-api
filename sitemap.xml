@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://example.com/api_framework/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/api_framework/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/api_framework/"/>
+    </url>
+    <url>
+        <loc>https://example.com/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/"/>
+    </url>
+    <url>
+        <loc>https://example.com/ris_synergy/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/ris_synergy/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/ris_synergy/"/>
+    </url>
+    <url>
+        <loc>https://example.com/routes/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/routes/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/routes/"/>
+    </url>
+    <url>
+        <loc>https://example.com/de/api_framework/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/api_framework/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/api_framework/"/>
+    </url>
+    <url>
+        <loc>https://example.com/de/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/"/>
+    </url>
+    <url>
+        <loc>https://example.com/de/ris_synergy/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/ris_synergy/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/ris_synergy/"/>
+    </url>
+    <url>
+        <loc>https://example.com/de/routes/</loc>
+        <lastmod>2025-03-03</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="de" href="https://example.com/de/routes/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://example.com/routes/"/>
+    </url>
+</urlset>
