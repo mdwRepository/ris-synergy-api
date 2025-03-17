@@ -17,7 +17,7 @@ cffi==1.17.1
 pycparser==2.22
 # Swagger / OpenAPI
 PyYAML==6.0.2 
-attrs==25.1.0 
+attrs==25.3.0 
 flasgger==0.9.7.1 
 jsonschema==4.23.0 
 jsonschema-specifications==2024.10.1 
