@@ -3,5 +3,5 @@ dill==0.4.0
 isort==6.0.1 
 mccabe==0.7.0 
 platformdirs==4.3.7 
-pylint==3.3.6 
+pylint==3.3.7 
 tomlkit==0.13.2
